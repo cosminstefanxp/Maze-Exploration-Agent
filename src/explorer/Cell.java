@@ -61,7 +61,7 @@ public class Cell {
 	public Visibility visible;
 	
 	/** The probability of exploding, if it's a trap. */
-	public float probability=0.9f;
+	public float probability=0f;
 	
 	/** The hint. */
 	public Direction hint;
@@ -111,5 +111,14 @@ public class Cell {
 		if (y != other.y)
 			return false;
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Cell [x=" + x + ", y=" + y + ", type=" + type + ", visible=" + visible + ", hint=" + hint
+				+ ", probability=" + probability + "]";
 	}
 }

@@ -60,7 +60,7 @@ public class CellGraphics extends Cell {
 		int yPos = yCount * (size + padding);
 
 
-		drawAt(g, xPos, yPos);
+		drawAt(g, yPos, xPos);	//swap to consider x as line number and y as column number
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class CellGraphics extends Cell {
 			colorText = emptyColor;
 			break;
 		case Goal:
-			text = "A";
+			text = "G";
 			colorText = goalColor;
 			break;
 		case Exit:

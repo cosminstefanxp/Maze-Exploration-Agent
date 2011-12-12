@@ -13,9 +13,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.List;
-
-import explorer.Cell;
 
 /**
  * The Class MapCanvas.
@@ -37,16 +34,13 @@ public class MapCanvas extends Canvas {
 	/**
 	 * Instantiates a new map canvas.
 	 */
-	public MapCanvas(List<Cell> cells) {
+	public MapCanvas(ArrayList<CellGraphics> cells) {
 		setBackground (Color.DARK_GRAY);
 		setFont(new Font("Dialog", Font.BOLD, 14));
 		
 		//Add all the cells as CellGraphics
-		this.cells=new ArrayList<CellGraphics>();
-		for(Cell cell: cells)
-		{
-			this.cells.add((CellGraphics)cell);
-		}
+		this.cells=cells;
+
 	}
 
 	/* (non-Javadoc)

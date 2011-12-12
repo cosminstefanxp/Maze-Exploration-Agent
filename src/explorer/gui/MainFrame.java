@@ -10,6 +10,7 @@ package explorer.gui;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Font;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,6 +20,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import explorer.Cell;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -45,15 +48,15 @@ public class MainFrame extends JFrame {
 	/**
 	 * Instantiates a new main frame.
 	 */
-	public MainFrame() {
-		initialize();
+	public MainFrame(ArrayList<CellGraphics> cells) {
+		initialize(cells);
 		this.setVisible(true);
 	}
 
 	/**
 	 * Initialize the graphical elements of the Frame;.
 	 */
-	private void initialize() {
+	private void initialize(ArrayList<CellGraphics> cells) {
 
 		this.setBounds(100, 100, 900, 639);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,7 +82,7 @@ public class MainFrame extends JFrame {
 		mapPanel.setBorder(new TitledBorder(null, "Map", TitledBorder.CENTER, TitledBorder.TOP, null, null));
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
 
-		mapCanvas = new MapCanvas();
+		mapCanvas = new MapCanvas(cells);
 		mapPanel.setLayout(new BorderLayout(0, 0));
 		mapPanel.add(mapCanvas, BorderLayout.CENTER);
 		
