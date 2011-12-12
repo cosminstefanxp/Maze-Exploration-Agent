@@ -82,6 +82,16 @@ public class MainFrame extends JFrame {
 		mapCanvas = new MapCanvas();
 		mapPanel.setLayout(new BorderLayout(0, 0));
 		mapPanel.add(mapCanvas, BorderLayout.CENTER);
+		
+		JPanel panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, "Legend", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		mapPanel.add(panel, BorderLayout.SOUTH);
+		panel.setLayout(new BorderLayout(0, 0));
+		
+		//Legend section
+		Canvas legendCanvas=new LegendCanvas();
+		panel.add(legendCanvas);
+		legendCanvas.setSize(600, 50);
 
 		//Side Section
 		JPanel sidePanel = new JPanel();
@@ -101,6 +111,7 @@ public class MainFrame extends JFrame {
 
 		btnPreviousMove = new JButton("Previous Move");
 		sidePanel.add(btnPreviousMove, "cell 0 4");
+		
 	}
 
 }

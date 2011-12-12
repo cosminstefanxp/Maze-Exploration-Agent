@@ -22,11 +22,15 @@ public class Cell {
 		/** The Trap. */
 		Trap,		
 		/** The Empty. */
-		Empty
+		Empty,
+		/** The Goal. */
+		Goal,
+		/** The Exit. */
+		Exit
 	}
 	
 	/**
-	 * The Enum Visibility
+	 * The Enum Visibility.
 	 */
 	public enum Visibility {
 		/** The Explored. */
@@ -35,6 +39,13 @@ public class Cell {
 		Visible,
 		/** The Hidden. */
 		Hidden
+	}
+	
+	/**
+	 * The Enum Direction.
+	 */
+	public enum Direction {
+		N, NE, E, SE, S, SW, W, NW
 	}
 	
 	/** The x position. */
@@ -49,6 +60,12 @@ public class Cell {
 	/** The visible. */
 	public Visibility visible;
 	
+	/** The probability of exploding, if it's a trap. */
+	public float probability=0.9f;
+	
+	/** The hint. */
+	public Direction hint;
+	
 	/**
 	 * Instantiates a new cell.
 	 *
@@ -62,6 +79,7 @@ public class Cell {
 		this.y = y;
 		this.type = type;
 		this.visible=Visibility.Explored;
+		this.hint=null;
 	}
 
 	/* (non-Javadoc)

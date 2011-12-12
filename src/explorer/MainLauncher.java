@@ -21,6 +21,11 @@ public class MainLauncher {
 	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
+		
+		//Prepare the Map
+		Map map=new Map();
+		
+		//Run the graphics
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

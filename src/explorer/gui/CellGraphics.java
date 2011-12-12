@@ -7,8 +7,6 @@
 package explorer.gui;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import explorer.Cell;
@@ -18,14 +16,18 @@ import explorer.Cell;
  */
 public class CellGraphics extends Cell {
 
-	public static final int size=30;
-	public static final Color exploredColor=	Color.LIGHT_GRAY;
-	public static final Color visibleColor=		Color.WHITE;
-	public static final Color unexploredColor=	Color.GRAY;
-	public static final int padding=1;
-	public static int minX=0;
-	public static int minY=0;
-	public static final Color emptyColor=new Color(0.2f, 0.5f, 0.4f);
+	public static final int size = 32;
+	public static final int padding = 1;
+	public static final Color exploredColor = Color.LIGHT_GRAY;
+	public static final Color visibleColor = Color.WHITE;
+	public static final Color unexploredColor = Color.GRAY;
+	public static final Color emptyColor = new Color(0.2f, 0.5f, 0.4f);
+	public static final Color trapColor = Color.ORANGE;
+	public static final Color wallColor = Color.BLACK;
+	public static final Color goalColor = Color.MAGENTA;
+	public static final Color exitColor = Color.BLUE;
+	public static int minXCell = 0;
+	public static int minYCell = 0;
 	
 	
 	/**
@@ -41,68 +43,89 @@ public class CellGraphics extends Cell {
 
 
 	/**
-	 * Draw.
+	 * Draw the cell.
 	 *
 	 * @param g the g
 	 */
-	public void draw(Graphics g)
+	public void draw(Graphics2D g)
 	{
-		Graphics2D g2=(Graphics2D) g;
+		// Calculate which cell this one is (compared to the most left and top
+		// one)
+		// Also, skip 1 row and 1 column (padding)
+		int xCount = this.x - CellGraphics.minXCell + 1;
+		int yCount = this.y - CellGraphics.minYCell + 1;
+
+		// Calculate coordinates
+		int xPos = xCount * (size + padding);
+		int yPos = yCount * (size + padding);
+
+
+		drawAt(g, xPos, yPos);
+	}
+	
+	/**
+	 * Draw the cell at a given position.
+	 *
+	 * @param g the g
+	 * @param xPos the x pos
+	 * @param yPos the y pos
+	 */
+	public void drawAt(Graphics2D g, int xPos, int yPos)
+	{
+		// Prepare attributes
+		String text = null;
+		Color colorText = null;
+		Color color = null;
+		int textXPos = xPos + 10;
+		int textYPos = yPos + 22;		
 		
-		//Calculate which cell this one is (compared to the most left and top one)
-		//Also, skip 1 row and 1 column (padding)
-		int xCount=this.x-CellGraphics.minX+1;
-		int yCount=this.y-CellGraphics.minY+1;
-		
-		//Calculate coordinates
-		int xPos=xCount*(size+padding);
-		int yPos=yCount*(size+padding);
-		
-		//Draw the text inside
-		int textXPos=xPos+10;
-		int textYPos=yPos+20;
-		String text=null;
-		Color colorText=null;
-		Color color=null;
-		switch(this.type)
-		{
-		case Empty:
-			text="E";
-			colorText=emptyColor;
-			break;
-		case Trap:
-			text="T";
-			colorText=emptyColor;
-			break;
-		case Wall:
-			text="W";
-			colorText=emptyColor;
-			break;
-		case Clue:
-			text="?";
-			colorText=emptyColor;
-			break;
-		default:
-			text="!";
-			colorText=Color.RED;
-		}
-		
-		switch(this.visible)
+		// Color
+		switch (this.visible)
 		{
 		case Explored: 	color=exploredColor; break;
 		case Hidden:	color=unexploredColor; break;
 		case Visible:	color=visibleColor; break;
 		}
 
-		//Draw the cell
-		g2.setColor(color);
-		g2.fillRect(xPos, yPos, size, size);
+		// Text attributes
+		switch (this.type) {
+		case Empty:
+			text = "E";
+			colorText = emptyColor;
+			break;
+		case Trap:
+			textXPos-=6;
+			text = String.format("%2.1f", probability);
+			colorText = trapColor;
+			break;
+		case Wall:
+			text = "W";
+			colorText = wallColor;
+			break;
+		case Clue:
+			text = "?"+this.hint;
+			textXPos-=8;
+			colorText = emptyColor;
+			break;
+		case Goal:
+			text = "A";
+			colorText = goalColor;
+			break;
+		case Exit:
+			text = "e";
+			colorText = exitColor;
+			break;			
+		default:
+			text = "!";
+			colorText = Color.RED;
+		}
 		
-		//Draw the text inside
-		g2.setColor(colorText);
-		g2.drawString(text, textXPos, textYPos);
-		
-		
-		
+		// Draw the cell
+		g.setColor(color);
+		g.fillRect(xPos, yPos, size, size);
+
+		// Draw the text inside
+		g.setColor(colorText);
+		g.drawString(text, textXPos, textYPos);
 	}
 }
