@@ -23,9 +23,11 @@ public class CellGraphics extends Cell {
 	public static final Color unexploredColor = Color.GRAY;
 	public static final Color emptyColor = new Color(0.2f, 0.5f, 0.4f);
 	public static final Color trapColor = Color.ORANGE;
-	public static final Color wallColor = Color.BLACK;
+	public static final Color wallColor = Color.RED;
+	public static final Color wallBackColor = new Color(0.35f,0.35f,0.35f);
 	public static final Color goalColor = Color.MAGENTA;
 	public static final Color exitColor = Color.BLUE;
+	public static final Color currentPositionColor = Color.CYAN;
 	public static int minXCell = 0;
 	public static int minYCell = 0;
 	
@@ -85,12 +87,13 @@ public class CellGraphics extends Cell {
 		case Explored: 	color=exploredColor; break;
 		case Hidden:	color=unexploredColor; break;
 		case Visible:	color=visibleColor; break;
+		case Robot:		color=currentPositionColor; break;
 		}
 
 		// Text attributes
 		switch (this.type) {
 		case Empty:
-			text = "E";
+			text = "o";
 			colorText = emptyColor;
 			break;
 		case Trap:
@@ -99,8 +102,9 @@ public class CellGraphics extends Cell {
 			colorText = trapColor;
 			break;
 		case Wall:
-			text = "W";
+			text = "#";
 			colorText = wallColor;
+			color = wallBackColor;
 			break;
 		case Clue:
 			text = "?"+this.hint;

@@ -33,12 +33,15 @@ public class Cell {
 	 * The Enum Visibility.
 	 */
 	public enum Visibility {
-		/** The Explored. */
+		/** The cell is Explored. */
 		Explored,
-		/** The Visible. */
+		/** The cell is Visible. */
 		Visible,
-		/** The Hidden. */
-		Hidden
+		/** The cell is Hidden. */
+		Hidden,
+		/** The Robot is there. */
+		Robot
+		
 	}
 	
 	/**
@@ -78,7 +81,7 @@ public class Cell {
 		this.x = x;
 		this.y = y;
 		this.type = type;
-		this.visible=Visibility.Explored;
+		this.visible=Visibility.Hidden;
 		this.hint=null;
 	}
 

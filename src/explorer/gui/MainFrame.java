@@ -21,8 +21,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import explorer.Cell;
-
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -104,7 +102,7 @@ public class MainFrame extends JFrame {
 		JLabel lblSideTitle = new JLabel("Control Panel");
 		lblSideTitle.setFont(new Font("Dialog", Font.BOLD, 14));
 		lblSideTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		sidePanel.add(lblSideTitle, "cell 0 0,alignx left,aligny center");
+		sidePanel.add(lblSideTitle, "cell 0 0,growx,aligny center");
 
 		tglbtnAutoplay = new JToggleButton("Autoplay");
 		sidePanel.add(tglbtnAutoplay, "cell 0 2,growx");
