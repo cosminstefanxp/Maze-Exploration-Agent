@@ -87,7 +87,7 @@ public class LegendCanvas extends Canvas {
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Empty);
-		cell.visible=Visibility.Explored;
+		cell.visible=Visibility.Known;
 		cell.drawAt(g2, 600, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);

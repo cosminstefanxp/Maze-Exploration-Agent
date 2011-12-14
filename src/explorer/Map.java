@@ -125,7 +125,7 @@ public class Map {
 
 			// Mark the starting color
 			if (posX == startX && posY == startY)
-				newCell.visible = Visibility.Robot;
+				newCell.visible = Visibility.Current;
 
 			MainLauncher.debug("New cell: " + newCell.toString());
 			cells.put(new Position(posX, posY), newCell);
@@ -146,13 +146,13 @@ public class Map {
 		ArrayList<Cell> nCells = new ArrayList<Cell>(4);
 		Cell cell;
 
-		// Left
-		cell = cells.get(new Position(cellX, cellY - 1));
-		if (cell != null && cell.type!=Type.Wall)
-			nCells.add(cell);
-
 		// Right
 		cell = cells.get(new Position(cellX, cellY + 1));
+		if (cell != null && cell.type!=Type.Wall)
+			nCells.add(cell);
+	
+		// Left
+		cell = cells.get(new Position(cellX, cellY - 1));
 		if (cell != null && cell.type!=Type.Wall)
 			nCells.add(cell);
 		
@@ -166,6 +166,61 @@ public class Map {
 		if (cell != null && cell.type!=Type.Wall)
 			nCells.add(cell);
 
+
+		return nCells;
+	}
+	
+	/**
+	 * Gets all the neighbours of a given position on the map. Compared to getNeighbours, this method
+	 * also returns the cells that do not exist on the map as wall cells; As a side-effect, the virtually
+	 * generated wall cells are also added to the cells Map.
+	 *
+	 * @param cellX the cell x
+	 * @param cellY the cell y
+	 * @return the neighbours
+	 */
+	public ArrayList<Cell> getNeighboursFull(int cellX, int cellY) {
+		ArrayList<Cell> nCells = new ArrayList<Cell>(4);
+		Cell cell;
+
+		// Left
+		cell = cells.get(new Position(cellX, cellY - 1));
+		if (cell != null)
+			nCells.add(cell);
+		else {
+			Cell newCell = new CellGraphics(cellX, cellY - 1, Type.Wall);
+			nCells.add(newCell);
+			cells.put(new Position(cellX, cellY - 1), newCell);
+		}
+
+		// Right
+		cell = cells.get(new Position(cellX, cellY + 1));
+		if (cell != null)
+			nCells.add(cell);
+		else {
+			Cell newCell = new CellGraphics(cellX, cellY + 1, Type.Wall);
+			nCells.add(newCell);
+			cells.put(new Position(cellX, cellY + 1), newCell);
+		}
+		// Above
+		cell = cells.get(new Position(cellX - 1, cellY));
+		if (cell != null)
+			nCells.add(cell);
+		else {
+			Cell newCell = new CellGraphics(cellX - 1, cellY, Type.Wall);
+			nCells.add(newCell);
+			cells.put(new Position(cellX - 1, cellY), newCell);
+		}
+
+		// Below
+		cell = cells.get(new Position(cellX + 1, cellY));
+		if (cell != null)
+			nCells.add(cell);
+		else {
+			Cell newCell = new CellGraphics(cellX + 1, cellY, Type.Wall);
+			nCells.add(newCell);
+			cells.put(new Position(cellX + 1, cellY), newCell);
+		}
 
 		return nCells;
 	}
@@ -192,7 +247,7 @@ public class Map {
 			Position newP;
 			
 			//Get current neighbours
-			List<Cell> neigh=this.getNeighbours(pos.x, pos.y);
+			List<Cell> neigh=this.getNeighboursFull(pos.x, pos.y);
 			for(Cell cell : neigh)
 			{
 				//If the neighbour is in range and it hasn't been expanded, we add it to the borderList
@@ -200,12 +255,8 @@ public class Map {
 				if(inRange(startPos, newP) &&
 						!visible.contains(cell))
 				{
-					//ignore wall cells
-					if(cell.type!=Type.Wall)
-					{
-						borderList.add(newP);
-						visible.add(cell);
-					}
+					borderList.add(newP);
+					visible.add(cell);
 				}
 			}
 			

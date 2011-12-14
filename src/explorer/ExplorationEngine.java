@@ -8,8 +8,11 @@ package explorer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 
+import explorer.Cell.Type;
 import explorer.Cell.Visibility;
 
 
@@ -30,6 +33,9 @@ public class ExplorationEngine {
 	/** The known cells are the cells which I have either explored either observed. */
 	HashSet<Cell> knownCells;
 	
+	/** The wall cells. */
+	HashSet<Cell> knownWallCells;
+	
 	/** The unvisited but known cells. */
 	HashSet<Cell> unvisitedCells;
 	
@@ -47,8 +53,10 @@ public class ExplorationEngine {
 		//Prepare the fields
 		this.map = map;
 		this.currentCell=map.getCell(map.startX, map.startY);
-		this.visibleCells=map.getVisibleCells(currentCell.x,currentCell.y);
-		this.knownCells=new HashSet<Cell>(visibleCells);
+		this.visibleCells=new HashSet<Cell>();
+		this.knownCells=new HashSet<Cell>();
+		this.knownWallCells=new HashSet<Cell>();
+		updateVisible();
 		this.knownCells.add(currentCell);
 		this.unvisitedCells=new HashSet<Cell>(visibleCells);
 		this.unvisitedCells.remove(currentCell);
@@ -56,7 +64,17 @@ public class ExplorationEngine {
 		//Mark the cells accordingly
 		for(Cell cell:visibleCells)
 			cell.visible=Visibility.Visible;
-		currentCell.visible=Visibility.Robot;
+		currentCell.visible=Visibility.Current;
+	}
+	
+	/**
+	 * Checks if is on goal state.
+	 *
+	 * @return true, if is on goal state
+	 */
+	public boolean isOnGoalState()
+	{
+		return currentCell.type==Type.Goal;
 	}
 	
 	/**
@@ -66,13 +84,25 @@ public class ExplorationEngine {
 	 */
 	public String nextStep()
 	{
+			
 		MainLauncher.debug("Calculating next step from "+currentCell);
+
+		//Check for goal state
+		if(isOnGoalState())
+			return "Reached goal cell!";
+		
 		//Get updated ratings
 		updateCosts();
 		MainLauncher.debug("Cells after ratings calculation "+knownCells);
-		
-		ArrayList<Cell> neigh=map.getNeighbours(currentCell.x, currentCell.y);
-		this.updateCurrent(neigh.get(0));
+		//Get potential targets
+		PriorityQueue<Cell> potentialTargets=getPotentialTargets();
+		MainLauncher.debug("Potential target cells: "+potentialTargets);
+		//Select potential target and get path
+		Cell target=potentialTargets.remove();
+		LinkedList<Cell> path=getPathTo(currentCell, target);
+		MainLauncher.debug("Selected target "+target+" with path: "+path);
+		//Update to the new position
+		this.updateCurrent(path.getFirst());
 		this.updateVisible();
 		MainLauncher.debug("Moving to "+currentCell);
 		return "Move to ["+currentCell.x+","+currentCell.y+"]"; 
@@ -86,16 +116,29 @@ public class ExplorationEngine {
 		//Mark the old cells accordingly
 		this.visibleCells.remove(currentCell);
 		for(Cell cell:visibleCells)
-			cell.visible=Visibility.Explored;
+			cell.visible=Visibility.Known;
 		
 		//Mark the new cells accordingly
-		this.visibleCells=map.getVisibleCells(currentCell.x, currentCell.y);
+		HashSet<Cell> allVisibleCells=map.getVisibleCells(currentCell.x, currentCell.y);
+		visibleCells.clear();
+		//Break the visible cells into wall cells and normal cells
+		for(Cell cell:allVisibleCells)
+			if(cell.type==Type.Wall)
+				knownWallCells.add(cell);
+			else
+				visibleCells.add(cell);
+		
+		//Mark the visible cells accordingly
 		this.visibleCells.remove(currentCell);
 		for(Cell cell:visibleCells)
 			cell.visible=Visibility.Visible;
 		
 		//Add the new cells to the known list
 		this.knownCells.addAll(visibleCells);
+		
+		MainLauncher.debug("Visible after update: "+visibleCells);
+		MainLauncher.debug("Known after update: "+knownCells);
+		MainLauncher.debug("Known wall cells after update: " + knownWallCells);
 	}
 	
 	/**
@@ -103,21 +146,11 @@ public class ExplorationEngine {
 	 *
 	 * @param newCell the new cell
 	 */
-	private void updateCurrent(Cell newCell)
+	public void updateCurrent(Cell newCell)
 	{
-		this.currentCell.visible=Visibility.Explored;
+		this.currentCell.visible=Visibility.Known;
 		this.currentCell=newCell;
-		newCell.visible=Visibility.Robot;
-	}
-	
-	/**
-	 * Checks if is goal.
-	 *
-	 * @return true, if is goal
-	 */
-	public boolean isGoal()
-	{
-		return false;
+		newCell.visible=Visibility.Current;
 	}
 	
 	/**
@@ -156,5 +189,66 @@ public class ExplorationEngine {
 					}
 				}
 		}
+	}
+	
+	/**
+	 * Gets the potential goal cells of the current step. It returns all the visible clue cells and all the
+	 * cells that are on the visible border (there's a potential to explore more from there). If the final
+	 * goal cell is visible, the method only returns that one.
+	 *
+	 * @return the potential goals
+	 */
+	private PriorityQueue<Cell> getPotentialTargets()
+	{
+		PriorityQueue<Cell> goals=new PriorityQueue<Cell>();
+		for(Cell cell:knownCells)
+		{
+			if(cell.type==Type.Goal)
+			{
+				goals.clear();
+				goals.add(cell);
+				break;
+			}
+			if(isCellVisibleBorder(cell) || cell.type==Type.Clue)
+				goals.add(cell);
+		}
+		return goals;
+	}
+	
+	/**
+	 * Checks if is the cell is on the visible border, which means it has at least one neighbour not known
+	 * to the engine.
+	 *
+	 * @param cell the cell
+	 * @return true, if is cell visible border
+	 */
+	private boolean isCellVisibleBorder(Cell cell)
+	{
+		List<Cell> neigh=map.getNeighboursFull(cell.x, cell.y);
+		
+		//if one of the neighbours is not known by the robot, it's a border cell
+		for(Cell ncell : neigh)
+			if(!knownCells.contains(ncell) && !knownWallCells.contains(ncell))
+				return true;
+		return false;
+	}
+	
+	/**
+	 * Gets the path to a given cell, using the predecessor field from the cells.
+	 *
+	 * @param source the source
+	 * @param destination the destination
+	 * @return the path to
+	 */
+	private LinkedList<Cell> getPathTo(Cell source, Cell destination)
+	{
+		LinkedList<Cell> path=new LinkedList<Cell>();
+		Cell cell=destination;
+		while(cell!=source)
+		{
+			path.addFirst(cell);
+			cell=cell.predecessor;
+		}
+		return path;
 	}
 }

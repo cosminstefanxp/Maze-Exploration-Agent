@@ -18,13 +18,13 @@ public class CellGraphics extends Cell {
 
 	public static final int size = 32;
 	public static final int padding = 1;
-	public static final Color exploredColor = Color.LIGHT_GRAY;
-	public static final Color visibleColor = Color.WHITE;
-	public static final Color unexploredColor = Color.GRAY;
+	public static final Color knownColor = new Color(0.6f,0.6f,0.6f);
+	public static final Color visibleColor = new Color(0.87f,0.88f,0.97f);
+	public static final Color hiddenColor = Color.GRAY.darker();
 	public static final Color emptyColor = new Color(0.2f, 0.5f, 0.4f);
 	public static final Color trapColor = Color.ORANGE;
 	public static final Color wallColor = Color.RED;
-	public static final Color wallBackColor = new Color(0.35f,0.35f,0.35f);
+	public static final Color wallBackColor = new Color(0.3f,0.3f,0.3f);
 	public static final Color goalColor = Color.MAGENTA;
 	public static final Color exitColor = Color.BLUE;
 	public static final Color currentPositionColor = Color.CYAN;
@@ -84,10 +84,10 @@ public class CellGraphics extends Cell {
 		// Color
 		switch (this.visible)
 		{
-		case Explored: 	color=exploredColor; break;
-		case Hidden:	color=unexploredColor; break;
+		case Known: 	color=knownColor; break;
+		case Hidden:	color=hiddenColor; break;
 		case Visible:	color=visibleColor; break;
-		case Robot:		color=currentPositionColor; break;
+		case Current:		color=currentPositionColor; break;
 		}
 
 		// Text attributes

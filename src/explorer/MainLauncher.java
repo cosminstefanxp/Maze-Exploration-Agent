@@ -8,13 +8,12 @@ package explorer;
 
 import java.awt.EventQueue;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
-import explorer.gui.CellGraphics;
 import explorer.gui.MainFrame;
 
 /**
@@ -24,9 +23,6 @@ public class MainLauncher {
 
 	/** The map. */
 	private static Map map;
-	
-	/** The cells. */
-	private static ArrayList<CellGraphics> cells;
 	
 	/** The Constant stepDuration. */
 	private static final int stepDuration=1000;
@@ -43,7 +39,10 @@ public class MainLauncher {
 	/** The autoplay. */
 	public static Boolean autoplay=true;
 	
+	/** The engine. */
 	public static ExplorationEngine engine;
+	
+	public static LinkedList<Cell> path=new LinkedList<Cell>();
 	
 	/**
 	 * Debug printing.
@@ -66,7 +65,7 @@ public class MainLauncher {
 		//Prepare the Map
 		map=new Map();
 		try {
-			cells=map.loadFromFile("test2");
+			map.loadFromFile("test2");
 		} catch (FileNotFoundException e1) {
 			JOptionPane.showMessageDialog(null, "Error while reading map file.", "Eroare citire fisier", JOptionPane.ERROR_MESSAGE);
 			e1.printStackTrace();
@@ -76,7 +75,7 @@ public class MainLauncher {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					frame=new MainFrame(cells);
+					frame=new MainFrame(map.cells);
 					MainLauncher.sem.release();
 					MainLauncher.debug("Graphics initialization done");
 				} catch (Exception e) {
@@ -89,7 +88,6 @@ public class MainLauncher {
 		try {
 			sem.acquire();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -99,7 +97,7 @@ public class MainLauncher {
 		
 		//While we have not found the goal, we keep exploring
 		String moveDescription;
-		while(!engine.isGoal())
+		while(!engine.isOnGoalState())
 		{
 			//We sleep a while
 			try {
@@ -108,12 +106,19 @@ public class MainLauncher {
 				e.printStackTrace();
 			}
 			lock.lock();
+			//Save current position
+			path.push(engine.currentCell);
+			
 			//Perform the next step and redraw
 			moveDescription=engine.nextStep();
 			frame.addMoveDescription(moveDescription);
 			frame.repaintMap();
 			lock.unlock();
 		}
+		
+		//We have found the goal
+		debug("Goal found!");
+		frame.addMoveDescription("Goal cell found!");
 	}
 	
 	/**
@@ -122,9 +127,28 @@ public class MainLauncher {
 	public static void nextMove()
 	{
 		String moveDescription;
+		//Save current position
+		path.push(engine.currentCell);
+
 		//Perform the next step and redraw
 		moveDescription=engine.nextStep();
 		frame.addMoveDescription(moveDescription);
+		frame.repaintMap();
+	}
+	
+	/**
+	 * Previous move.
+	 */
+	public static void previousMove()
+	{
+		if(path.isEmpty())
+		{
+			frame.addMoveDescription("No previous moves");
+			return;
+		}
+		//Perform the previous step and redraw
+		engine.updateCurrent(path.pop());
+		frame.addMoveDescription("Moved back");
 		frame.repaintMap();
 	}
 }

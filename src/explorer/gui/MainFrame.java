@@ -12,7 +12,7 @@ import java.awt.Canvas;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,7 +27,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
+import explorer.Cell;
 import explorer.MainLauncher;
+import explorer.Position;
 
 /**
  * The Class MainFrame that contains the main gui of the application.
@@ -56,7 +58,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Instantiates a new main frame.
 	 */
-	public MainFrame(ArrayList<CellGraphics> cells) {
+	public MainFrame(HashMap<Position, Cell> cells) {
 		initialize(cells);
 		this.setVisible(true);
 	}
@@ -64,7 +66,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Initialize the graphical elements of the Frame;.
 	 */
-	private void initialize(ArrayList<CellGraphics> cells) {
+	private void initialize(HashMap<Position, Cell> cells) {
 
 		this.setBounds(100, 100, 1100, 639);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,6 +117,7 @@ public class MainFrame extends JFrame {
 		sidePanel.add(lblSideTitle, "cell 0 0,growx,aligny center");
 
 		tglbtnAutoplay = new JToggleButton("Autoplay");
+		tglbtnAutoplay.setSelected(true);
 		tglbtnAutoplay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(MainLauncher.autoplay)
@@ -145,6 +148,14 @@ public class MainFrame extends JFrame {
 		sidePanel.add(btnNextMove, "cell 0 3,growx,aligny center");
 
 		btnPreviousMove = new JButton("Previous Move");
+		btnPreviousMove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				MainLauncher.debug("Manual previoues move!");
+				MainLauncher.lock.lock();
+				MainLauncher.previousMove();
+				MainLauncher.lock.unlock();
+			}
+		});
 		sidePanel.add(btnPreviousMove, "cell 0 4");
 		
 		//Move Description section 

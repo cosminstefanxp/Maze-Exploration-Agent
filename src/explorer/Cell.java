@@ -33,14 +33,14 @@ public class Cell implements Comparable<Cell> {
 	 * The Enum Visibility.
 	 */
 	public enum Visibility {
-		/** The cell is Explored. */
-		Explored,
+		/** The cell is Known. */
+		Known,
 		/** The cell is Visible. */
 		Visible,
 		/** The cell is Hidden. */
 		Hidden,
 		/** The Robot is there. */
-		Robot
+		Current
 		
 	}
 	

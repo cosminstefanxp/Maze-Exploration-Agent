@@ -12,7 +12,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
+import java.util.HashMap;
+
+import explorer.Cell;
+import explorer.Position;
 
 /**
  * The Class MapCanvas.
@@ -20,7 +23,7 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class MapCanvas extends Canvas {
 	
-	ArrayList<CellGraphics> cells;
+	HashMap<Position, Cell> cells;
 	
 	/**
 	 * Instantiates a new map canvas.
@@ -34,12 +37,12 @@ public class MapCanvas extends Canvas {
 	/**
 	 * Instantiates a new map canvas.
 	 */
-	public MapCanvas(ArrayList<CellGraphics> cells) {
+	public MapCanvas(HashMap<Position, Cell> cells2) {
 		setBackground (Color.DARK_GRAY);
 		setFont(new Font("Dialog", Font.BOLD, 14));
 		
 		//Add all the cells as CellGraphics
-		this.cells=cells;
+		this.cells=cells2;
 
 	}
 
@@ -53,8 +56,8 @@ public class MapCanvas extends Canvas {
 
 		if(cells!=null)
 		{
-			for(CellGraphics cell: cells)
-				cell.draw(g2);	
+			for(Cell cell: cells.values())
+				((CellGraphics)cell).draw(g2);	
 		}
 		else
 		{
