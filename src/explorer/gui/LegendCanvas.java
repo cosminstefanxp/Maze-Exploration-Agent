@@ -15,6 +15,7 @@ import java.awt.Graphics2D;
 
 import explorer.Cell.Direction;
 import explorer.Cell.Type;
+import explorer.Cell.Visibility;
 
 /**
  * The Class LegendCanvas that show the cell legend to the user.
@@ -82,6 +83,30 @@ public class LegendCanvas extends Canvas {
 		cell.drawAt(g2, 500, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Exit", 535, 33);
+		g2.drawString("Exit  | ", 535, 33);
+		
+		//Desenam celula
+		cell=new CellGraphics(0, 0, Type.Empty);
+		cell.visible=Visibility.Explored;
+		cell.drawAt(g2, 600, 10);
+		//Scriem hintul
+		g2.setColor(Color.WHITE);
+		g2.drawString("Known", 635, 33);
+		
+		//Desenam celula
+		cell=new CellGraphics(0, 0, Type.Empty);
+		cell.visible=Visibility.Hidden;
+		cell.drawAt(g2, 700, 10);
+		//Scriem hintul
+		g2.setColor(Color.WHITE);
+		g2.drawString("Hidden", 735, 33);
+		
+		//Desenam celula
+		cell=new CellGraphics(0, 0, Type.Empty);
+		cell.visible=Visibility.Visible;
+		cell.drawAt(g2, 800, 10);
+		//Scriem hintul
+		g2.setColor(Color.WHITE);
+		g2.drawString("Visible", 835, 33);
 	}
 }

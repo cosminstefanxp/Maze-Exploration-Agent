@@ -52,8 +52,10 @@ public class Map {
 	 * Load the map and game info from file. Returns a list of CellGraphics
 	 * directly referencing the same cells as the ones from the map. The list
 	 * can be used for the graphics of the application.
-	 * 
-	 * @throws FileNotFoundException
+	 *
+	 * @param filename the filename
+	 * @return the array list
+	 * @throws FileNotFoundException the file not found exception
 	 */
 	public ArrayList<CellGraphics> loadFromFile(String filename) throws FileNotFoundException {
 
@@ -144,6 +146,16 @@ public class Map {
 		ArrayList<Cell> nCells = new ArrayList<Cell>(4);
 		Cell cell;
 
+		// Left
+		cell = cells.get(new Position(cellX, cellY - 1));
+		if (cell != null && cell.type!=Type.Wall)
+			nCells.add(cell);
+
+		// Right
+		cell = cells.get(new Position(cellX, cellY + 1));
+		if (cell != null && cell.type!=Type.Wall)
+			nCells.add(cell);
+		
 		// Above
 		cell = cells.get(new Position(cellX - 1, cellY));
 		if (cell != null && cell.type!=Type.Wall)
@@ -154,21 +166,12 @@ public class Map {
 		if (cell != null && cell.type!=Type.Wall)
 			nCells.add(cell);
 
-		// Left
-		cell = cells.get(new Position(cellX, cellY - 1));
-		if (cell != null && cell.type!=Type.Wall)
-			nCells.add(cell);
-
-		// Right
-		cell = cells.get(new Position(cellX, cellY + 1));
-		if (cell != null && cell.type!=Type.Wall)
-			nCells.add(cell);
 
 		return nCells;
 	}
 	
 	/**
-	 * Gets the visible cells.
+	 * Gets the visible cells. Ignores wall cells.
 	 *
 	 * @param cellX the cell x
 	 * @param cellY the cell y
@@ -197,8 +200,12 @@ public class Map {
 				if(inRange(startPos, newP) &&
 						!visible.contains(cell))
 				{
-					borderList.add(newP);
-					visible.add(cell);
+					//ignore wall cells
+					if(cell.type!=Type.Wall)
+					{
+						borderList.add(newP);
+						visible.add(cell);
+					}
 				}
 			}
 			
@@ -221,5 +228,41 @@ public class Map {
 		return false;
 	}
 	
-
+	/**
+	 * Gets the cell.
+	 *
+	 * @param pos the pos
+	 * @return the cell
+	 */
+	public Cell getCell(Position pos)
+	{
+		return cells.get(pos);
+	}
+	
+	/**
+	 * Gets the cell.
+	 *
+	 * @param x the x
+	 * @param y the y
+	 * @return the cell
+	 */
+	public Cell getCell(int x, int y)
+	{
+		return cells.get(new Position(x, y));
+	}
+	
+	/**
+	 * Checks if the given cells are neighbours.
+	 *
+	 * @param cell1 the cell1
+	 * @param cell2 the cell2
+	 */
+	public Boolean areNeighbours(Cell cell1, Cell cell2)
+	{
+		if(Math.abs(cell1.x-cell2.x)==1 && cell1.y==cell2.y)
+			return true;
+		if(Math.abs(cell1.y-cell2.y)==1 && cell1.x==cell2.x)
+			return true;
+		return false;
+	}
 }

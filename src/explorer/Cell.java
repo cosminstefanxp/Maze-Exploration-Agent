@@ -9,7 +9,7 @@ package explorer;
 /**
  * The Class Cell.
  */
-public class Cell {
+public class Cell implements Comparable<Cell> {
 
 	/**
 	 * The Enum Type.
@@ -69,6 +69,12 @@ public class Cell {
 	/** The hint. */
 	public Direction hint;
 	
+	/** The cost. */
+	public int cost;
+	
+	/** The previous. */
+	public Cell predecessor;
+	
 	/**
 	 * Instantiates a new cell.
 	 *
@@ -116,12 +122,35 @@ public class Cell {
 		return true;
 	}
 
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Cell [x=" + x + ", y=" + y + ", type=" + type + ", visible=" + visible + ", hint=" + hint
-				+ ", probability=" + probability + "]";
+		return "Cell [x=" + x + ", y=" + y + ", type=" + type + ", cost=" + cost+"]";
 	}
+
+	public int getDefaultRating()
+	{
+		switch(type)
+		{
+		case Trap: return (int) (probability*1000);	//cost is probability times 1000
+		case Clue: return 0;		//a clue has no, in order to prefer visiting a clue place rather than empty cell
+		case Goal: return 0;
+		case Wall: return Integer.MAX_VALUE;
+		default: return 10;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(Cell o) {
+		return this.cost-o.cost;
+	}
+
+
 }

@@ -53,7 +53,7 @@ public class Position {
 	 */
 	@Override
 	public String toString() {
-		return "Position [" + x + ", " + y + "]";
+		return "At[" + x + "," + y + "]";
 	}
 
 	public Position(int x, int y) {

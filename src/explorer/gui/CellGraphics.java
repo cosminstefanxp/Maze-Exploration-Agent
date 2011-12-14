@@ -93,7 +93,7 @@ public class CellGraphics extends Cell {
 		// Text attributes
 		switch (this.type) {
 		case Empty:
-			text = "o";
+			text = "";
 			colorText = emptyColor;
 			break;
 		case Trap:
