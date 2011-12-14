@@ -23,7 +23,8 @@ import explorer.Position;
 @SuppressWarnings("serial")
 public class MapCanvas extends Canvas {
 	
-	HashMap<Position, Cell> cells;
+	public HashMap<Position, Cell> cells;
+	public int hitpoints=0;
 	
 	/**
 	 * Instantiates a new map canvas.
@@ -64,5 +65,7 @@ public class MapCanvas extends Canvas {
 			g2.setColor(Color.RED);
 			g2.drawString("Missing cells map", 30, 30);
 		}
+		g2.setColor(Color.WHITE);
+		g2.drawString("Player hitpoints: "+hitpoints, 10, 20);
 	}
 }

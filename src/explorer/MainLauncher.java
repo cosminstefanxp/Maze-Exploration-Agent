@@ -93,10 +93,10 @@ public class MainLauncher {
 		
 		//Start the exploration engine
 		engine=new ExplorationEngine(map);
+		frame.mapCanvas.hitpoints=map.hitpoints;
 		frame.repaintMap();
 		
 		//While we have not found the goal, we keep exploring
-		String moveDescription;
 		while(!engine.isOnGoalState())
 		{
 			//We sleep a while
@@ -106,13 +106,7 @@ public class MainLauncher {
 				e.printStackTrace();
 			}
 			lock.lock();
-			//Save current position
-			path.push(engine.currentCell);
-			
-			//Perform the next step and redraw
-			moveDescription=engine.nextStep();
-			frame.addMoveDescription(moveDescription);
-			frame.repaintMap();
+			nextMove();
 			lock.unlock();
 		}
 		
@@ -132,6 +126,7 @@ public class MainLauncher {
 
 		//Perform the next step and redraw
 		moveDescription=engine.nextStep();
+		frame.mapCanvas.hitpoints=map.hitpoints;
 		frame.addMoveDescription(moveDescription);
 		frame.repaintMap();
 	}

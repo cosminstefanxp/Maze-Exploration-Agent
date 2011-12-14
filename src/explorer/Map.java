@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import explorer.Cell.Direction;
@@ -25,6 +26,9 @@ import explorer.gui.CellGraphics;
  */
 public class Map {
 
+	/** The rand. */
+	Random rand=new Random();
+	
 	/** The cells. */
 	public HashMap<Position, Cell> cells;
 
@@ -313,6 +317,19 @@ public class Map {
 		if(Math.abs(cell1.x-cell2.x)==1 && cell1.y==cell2.y)
 			return true;
 		if(Math.abs(cell1.y-cell2.y)==1 && cell1.x==cell2.x)
+			return true;
+		return false;
+	}
+
+	/**
+	 * True if the trap is activated.
+	 *
+	 * @return true, if successful
+	 */
+	public boolean explodes(Cell cell)
+	{
+		float explosionProb=rand.nextFloat();
+		if(explosionProb<cell.probability)
 			return true;
 		return false;
 	}

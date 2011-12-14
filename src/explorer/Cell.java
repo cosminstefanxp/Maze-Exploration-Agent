@@ -6,6 +6,7 @@
  */
 package explorer;
 
+
 /**
  * The Class Cell.
  */
@@ -48,7 +49,23 @@ public class Cell implements Comparable<Cell> {
 	 * The Enum Direction.
 	 */
 	public enum Direction {
-		N, NE, E, SE, S, SW, W, NW
+		
+		/** The N. */
+		N, 
+ /** The NE. */
+ NE, 
+ /** The E. */
+ E, 
+ /** The SE. */
+ SE, 
+ /** The S. */
+ S, 
+ /** The SW. */
+ SW, 
+ /** The W. */
+ W, 
+ /** The NW. */
+ NW
 	}
 	
 	/** The x position. */
@@ -71,6 +88,9 @@ public class Cell implements Comparable<Cell> {
 	
 	/** The cost. */
 	public int cost;
+	
+	/** The damage. */
+	public int damage=1;
 	
 	/** The previous. */
 	public Cell predecessor;
@@ -132,6 +152,11 @@ public class Cell implements Comparable<Cell> {
 		return "Cell [x=" + x + ", y=" + y + ", type=" + type + ", cost=" + cost+"]";
 	}
 
+	/**
+	 * Gets the default rating.
+	 *
+	 * @return the default rating
+	 */
 	public int getDefaultRating()
 	{
 		switch(type)
@@ -151,6 +176,6 @@ public class Cell implements Comparable<Cell> {
 	public int compareTo(Cell o) {
 		return this.cost-o.cost;
 	}
-
-
+	
+	
 }

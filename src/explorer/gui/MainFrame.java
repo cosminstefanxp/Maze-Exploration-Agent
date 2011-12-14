@@ -49,7 +49,7 @@ public class MainFrame extends JFrame {
 	private JButton btnPreviousMove;
 
 	/** The map canvas. */
-	private Canvas mapCanvas;
+	public MapCanvas mapCanvas;
 
 	private JTextArea textAreaDescription;
 
@@ -68,7 +68,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize(HashMap<Position, Cell> cells) {
 
-		this.setBounds(100, 100, 1100, 639);
+		this.setBounds(100, 100, 1161, 639);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -109,7 +109,7 @@ public class MainFrame extends JFrame {
 		//Side Section
 		JPanel sidePanel = new JPanel();
 		getContentPane().add(sidePanel, BorderLayout.EAST);
-		sidePanel.setLayout(new MigLayout("", "[117px,grow]", "[15px][0.00px][][][][grow]"));
+		sidePanel.setLayout(new MigLayout("", "[176.00px,grow]", "[15px][0.00px][][][][grow]"));
 
 		JLabel lblSideTitle = new JLabel("Control Panel");
 		lblSideTitle.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -156,7 +156,7 @@ public class MainFrame extends JFrame {
 				MainLauncher.lock.unlock();
 			}
 		});
-		sidePanel.add(btnPreviousMove, "cell 0 4");
+		sidePanel.add(btnPreviousMove, "cell 0 4,growx");
 		
 		//Move Description section 
 		scrollPane = new JScrollPane();
@@ -168,8 +168,8 @@ public class MainFrame extends JFrame {
 		panelDescription.setLayout(new BorderLayout(0, 0));
 		
 		textAreaDescription = new JTextArea();
-		textAreaDescription.setColumns(30);
-		panelDescription.add(textAreaDescription);
+		textAreaDescription.setColumns(20);
+		panelDescription.add(textAreaDescription, BorderLayout.WEST);
 		
 	}
 	

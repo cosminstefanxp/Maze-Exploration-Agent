@@ -42,6 +42,7 @@ public class ExplorationEngine {
 	/** The current position. */
 	Cell currentCell;
 	
+
 	/**
 	 * Instantiates a new exploration engine.
 	 *
@@ -105,7 +106,28 @@ public class ExplorationEngine {
 		this.updateCurrent(path.getFirst());
 		this.updateVisible();
 		MainLauncher.debug("Moving to "+currentCell);
-		return "Move to ["+currentCell.x+","+currentCell.y+"]"; 
+		//Perform action on current cell (if any)
+		String moveDescription;
+		moveDescription=actionOnCell();
+		return  moveDescription;
+	}
+	
+	private String actionOnCell()
+	{
+		String descr="";
+		if(currentCell.type==Type.Trap)
+		{
+			descr="Trying to stop trap\n";
+			boolean exploded=map.explodes(currentCell);
+			currentCell.type=Type.Empty;
+			if(exploded)
+			{
+				descr+="Trap exploded\n";
+				map.hitpoints-=currentCell.damage;
+			}	
+		}
+		
+		return descr+"Move to ["+currentCell.x+","+currentCell.y+"]";
 	}
 	
 	/**
