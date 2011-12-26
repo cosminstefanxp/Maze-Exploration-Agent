@@ -41,7 +41,9 @@ public class Cell implements Comparable<Cell> {
 		/** The cell is Hidden. */
 		Hidden,
 		/** The Robot is there. */
-		Current
+		Current,
+		/** The current AI Target. */
+		Target
 		
 	}
 	
@@ -49,23 +51,22 @@ public class Cell implements Comparable<Cell> {
 	 * The Enum Direction.
 	 */
 	public enum Direction {
-		
 		/** The N. */
 		N, 
- /** The NE. */
- NE, 
- /** The E. */
- E, 
- /** The SE. */
- SE, 
- /** The S. */
- S, 
- /** The SW. */
- SW, 
- /** The W. */
- W, 
- /** The NW. */
- NW
+		/** The NE. */
+		NE,
+		/** The E. */
+		E,
+		/** The SE. */
+		SE,
+		/** The S. */
+		S,
+		/** The SW. */
+		SW,
+		/** The W. */
+		W,
+		/** The NW. */
+		NW
 	}
 	
 	/** The x position. */

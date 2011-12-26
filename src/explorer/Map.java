@@ -44,6 +44,9 @@ public class Map {
 	/** The range. */
 	public int range;
 	
+	/* The minimum column of the map. */
+	public int minYCell, maxYCell;
+	
 	/**
 	 * Instantiates a new map.
 	 */
@@ -87,13 +90,24 @@ public class Map {
 
 		// Get the cells
 		int posX, posY, typeV;
+		int minXCell=Integer.MAX_VALUE;
+		minYCell=Integer.MAX_VALUE;
+		maxYCell=0;
 		Type type;
 		for (int i = 0; i < cellsNo; i++) {
 			// Reading cell data
 			posX = input.nextInt();
 			posY = input.nextInt();
 			typeV = input.nextInt();
-
+			
+			//Check for minimum
+			if(posX<minXCell)
+				minXCell=posX;
+			if(posY<minYCell)
+				minYCell=posY;
+			if(posY>maxYCell)
+				maxYCell=posY;
+			
 			// Get the type
 			switch (typeV) {
 			case 1:
@@ -135,6 +149,12 @@ public class Map {
 			cells.put(new Position(posX, posY), newCell);
 			cellsGraphics.add(newCell);
 		}
+		
+		//Set Cell Graphics minimum
+		CellGraphics.minXCell=minXCell;
+		CellGraphics.minYCell=minYCell;
+		
+		input.close();
 
 		return cellsGraphics;
 	}
@@ -230,7 +250,7 @@ public class Map {
 	}
 	
 	/**
-	 * Gets the visible cells. Ignores wall cells.
+	 * Gets the visible cells. Including wall cells.
 	 *
 	 * @param cellX the cell x
 	 * @param cellY the cell y
@@ -311,6 +331,7 @@ public class Map {
 	 *
 	 * @param cell1 the cell1
 	 * @param cell2 the cell2
+	 * @return the boolean
 	 */
 	public Boolean areNeighbours(Cell cell1, Cell cell2)
 	{
@@ -324,6 +345,7 @@ public class Map {
 	/**
 	 * True if the trap is activated.
 	 *
+	 * @param cell the cell
 	 * @return true, if successful
 	 */
 	public boolean explodes(Cell cell)

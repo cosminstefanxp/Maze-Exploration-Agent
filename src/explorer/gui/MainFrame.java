@@ -12,7 +12,6 @@ import java.awt.Canvas;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,9 +26,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
-import explorer.Cell;
 import explorer.MainLauncher;
-import explorer.Position;
+import explorer.Map;
 
 /**
  * The Class MainFrame that contains the main gui of the application.
@@ -58,15 +56,17 @@ public class MainFrame extends JFrame {
 	/**
 	 * Instantiates a new main frame.
 	 */
-	public MainFrame(HashMap<Position, Cell> cells) {
-		initialize(cells);
+	public MainFrame(Map map) {
+		Map[] maps=new Map[1];
+		maps[0]=map;
+		initialize(maps,1);
 		this.setVisible(true);
 	}
 
 	/**
 	 * Initialize the graphical elements of the Frame;.
 	 */
-	private void initialize(HashMap<Position, Cell> cells) {
+	private void initialize(Map[] maps, int count) {
 
 		this.setBounds(100, 100, 1161, 639);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -92,7 +92,7 @@ public class MainFrame extends JFrame {
 		mapPanel.setBorder(new TitledBorder(null, "Map", TitledBorder.CENTER, TitledBorder.TOP, null, null));
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
 
-		mapCanvas = new MapCanvas(cells);
+		mapCanvas = new MapCanvas(maps, count);
 		mapPanel.setLayout(new BorderLayout(0, 0));
 		mapPanel.add(mapCanvas, BorderLayout.CENTER);
 		
@@ -150,7 +150,7 @@ public class MainFrame extends JFrame {
 		btnPreviousMove = new JButton("Previous Move");
 		btnPreviousMove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				MainLauncher.debug("Manual previoues move!");
+				MainLauncher.debug("Manual previous move!");
 				MainLauncher.lock.lock();
 				MainLauncher.previousMove();
 				MainLauncher.lock.unlock();

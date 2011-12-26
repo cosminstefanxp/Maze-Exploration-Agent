@@ -12,10 +12,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.HashMap;
 
 import explorer.Cell;
-import explorer.Position;
+import explorer.Map;
 
 /**
  * The Class MapCanvas.
@@ -23,8 +22,11 @@ import explorer.Position;
 @SuppressWarnings("serial")
 public class MapCanvas extends Canvas {
 	
-	public HashMap<Position, Cell> cells;
-	public int hitpoints=0;
+	/** The maps. */
+	Map maps[];
+	
+	/** The maps count. */
+	int count;
 	
 	/**
 	 * Instantiates a new map canvas.
@@ -32,19 +34,20 @@ public class MapCanvas extends Canvas {
 	public MapCanvas() {
 		setBackground (Color.DARK_GRAY);
 		setFont(new Font("Dialog", Font.BOLD, 14));
-		cells=null;
+		maps=null;
+		count=0;
 	}
 	
 	/**
 	 * Instantiates a new map canvas.
 	 */
-	public MapCanvas(HashMap<Position, Cell> cells2) {
+	public MapCanvas(Map[] maps, int count) {
 		setBackground (Color.DARK_GRAY);
 		setFont(new Font("Dialog", Font.BOLD, 14));
 		
 		//Add all the cells as CellGraphics
-		this.cells=cells2;
-
+		this.maps=maps;
+		this.count=count;
 	}
 
 	/* (non-Javadoc)
@@ -55,17 +58,20 @@ public class MapCanvas extends Canvas {
 		Graphics2D g2;
 		g2 = (Graphics2D) g;
 
-		if(cells!=null)
+		for(int i=0;i<count;i++)
 		{
-			for(Cell cell: cells.values())
-				((CellGraphics)cell).draw(g2);	
+			if(maps[i]!=null)
+			{
+				for(Cell cell: maps[i].cells.values())
+					((CellGraphics)cell).draw(g2);	
+			}
+			else
+			{
+				g2.setColor(Color.RED);
+				g2.drawString("Missing cells map", 30, 30);
+			}
+			g2.setColor(Color.WHITE);
+			g2.drawString("Player hitpoints: "+maps[i].hitpoints, 10, this.getHeight()-10);
 		}
-		else
-		{
-			g2.setColor(Color.RED);
-			g2.drawString("Missing cells map", 30, 30);
-		}
-		g2.setColor(Color.WHITE);
-		g2.drawString("Player hitpoints: "+hitpoints, 10, 20);
 	}
 }

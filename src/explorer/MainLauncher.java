@@ -65,7 +65,7 @@ public class MainLauncher {
 		//Prepare the Map
 		map=new Map();
 		try {
-			map.loadFromFile("test2");
+			map.loadFromFile("test3");
 		} catch (FileNotFoundException e1) {
 			JOptionPane.showMessageDialog(null, "Error while reading map file.", "Eroare citire fisier", JOptionPane.ERROR_MESSAGE);
 			e1.printStackTrace();
@@ -75,7 +75,7 @@ public class MainLauncher {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					frame=new MainFrame(map.cells);
+					frame=new MainFrame(map);
 					MainLauncher.sem.release();
 					MainLauncher.debug("Graphics initialization done");
 				} catch (Exception e) {
@@ -93,11 +93,10 @@ public class MainLauncher {
 		
 		//Start the exploration engine
 		engine=new ExplorationEngine(map);
-		frame.mapCanvas.hitpoints=map.hitpoints;
 		frame.repaintMap();
 		
 		//While we have not found the goal, we keep exploring
-		while(!engine.isOnGoalState())
+		while(!engine.finished)
 		{
 			//We sleep a while
 			try {
@@ -111,8 +110,11 @@ public class MainLauncher {
 		}
 		
 		//We have found the goal
-		debug("Goal found!");
-		frame.addMoveDescription("Goal cell found!");
+		if(engine.isOnGoalState())
+			debug("Goal found!");
+		else
+			debug("Exploration finished!");
+		frame.addMoveDescription("Exploration finished!");
 	}
 	
 	/**
@@ -126,7 +128,6 @@ public class MainLauncher {
 
 		//Perform the next step and redraw
 		moveDescription=engine.nextStep();
-		frame.mapCanvas.hitpoints=map.hitpoints;
 		frame.addMoveDescription(moveDescription);
 		frame.repaintMap();
 	}

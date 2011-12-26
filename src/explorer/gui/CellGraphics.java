@@ -28,6 +28,7 @@ public class CellGraphics extends Cell {
 	public static final Color goalColor = Color.MAGENTA;
 	public static final Color exitColor = Color.BLUE;
 	public static final Color currentPositionColor = Color.CYAN;
+	public static final Color currentTargetColor = new Color(0.95f,0.7f,0.7f);
 	public static int minXCell = 0;
 	public static int minYCell = 0;
 	
@@ -87,7 +88,8 @@ public class CellGraphics extends Cell {
 		case Known: 	color=knownColor; break;
 		case Hidden:	color=hiddenColor; break;
 		case Visible:	color=visibleColor; break;
-		case Current:		color=currentPositionColor; break;
+		case Current:	color=currentPositionColor; break;
+		case Target:	color=currentTargetColor; break;
 		}
 
 		// Text attributes

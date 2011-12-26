@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import explorer.Cell.Direction;
 import explorer.Cell.Type;
 import explorer.Cell.Visibility;
 
@@ -22,7 +23,10 @@ import explorer.Cell.Visibility;
 public class ExplorationEngine {
 	
 	/** The Constant AGING_RATING. */
-	public static final int AGING_RATING=-1;
+	public static final int AGING_RATING=10;
+	
+	/** The Constant CLUE_BONUS_RATING. */
+	public static final int CLUE_BONUS_RATING=100; 
 
 	/** The map. */
 	Map map;
@@ -39,8 +43,21 @@ public class ExplorationEngine {
 	/** The unvisited but known cells. */
 	HashSet<Cell> unvisitedCells;
 	
+	/** The known clue cells. */
+	ArrayList<Cell> knownClueCells;
+	
 	/** The current position. */
 	Cell currentCell;
+	
+	/** The target cell. Actually it's the selected target, but on the graphical interface, the colored
+	 * cell is the one that was selected as a target for the move that was done to get to the current position.*/
+	Cell currentTargetCell;
+	
+	/** If the agent should find an exit or a goal. */
+	boolean findExit;
+	
+	/** If the exploration is finished. */
+	public boolean finished;
 	
 
 	/**
@@ -57,6 +74,7 @@ public class ExplorationEngine {
 		this.visibleCells=new HashSet<Cell>();
 		this.knownCells=new HashSet<Cell>();
 		this.knownWallCells=new HashSet<Cell>();
+		this.knownClueCells=new ArrayList<Cell>();
 		updateVisible();
 		this.knownCells.add(currentCell);
 		this.unvisitedCells=new HashSet<Cell>(visibleCells);
@@ -66,6 +84,20 @@ public class ExplorationEngine {
 		for(Cell cell:visibleCells)
 			cell.visible=Visibility.Visible;
 		currentCell.visible=Visibility.Current;
+		currentTargetCell=currentCell;
+	}
+	
+	/**
+	 * Checks if the given cell is the current goal cell (exit or artefact).
+	 *
+	 * @return true, if is on goal state
+	 */
+	public boolean isGoalState(Cell cell)
+	{
+		if(!findExit)
+			return cell.type==Type.Goal;
+		else
+			return cell.type==Type.Exit;
 	}
 	
 	/**
@@ -75,7 +107,7 @@ public class ExplorationEngine {
 	 */
 	public boolean isOnGoalState()
 	{
-		return currentCell.type==Type.Goal;
+		return findExit && isGoalState(currentCell);
 	}
 	
 	/**
@@ -96,42 +128,81 @@ public class ExplorationEngine {
 		updateCosts();
 		MainLauncher.debug("Cells after ratings calculation "+knownCells);
 		//Get potential targets
+		currentTargetCell.visible=Visibility.Known;
 		PriorityQueue<Cell> potentialTargets=getPotentialTargets();
 		MainLauncher.debug("Potential target cells: "+potentialTargets);
 		//Select potential target and get path
-		Cell target=potentialTargets.remove();
-		LinkedList<Cell> path=getPathTo(currentCell, target);
-		MainLauncher.debug("Selected target "+target+" with path: "+path);
+		if(potentialTargets.isEmpty())
+		{
+			finished=true;
+			return "No moves left!";
+		}
+		currentTargetCell=potentialTargets.remove();
+		LinkedList<Cell> path=getPathTo(currentCell, currentTargetCell);
+		MainLauncher.debug("Selected target "+currentTargetCell+" with path: "+path);
 		//Update to the new position
 		this.updateCurrent(path.getFirst());
 		this.updateVisible();
-		MainLauncher.debug("Moving to "+currentCell);
+		//Update visibility for current target and current position
+		currentTargetCell.visible=Visibility.Target;
+		currentCell.visible=Visibility.Current;
+		MainLauncher.debug("Moving to "+currentCell+"\n");
 		//Perform action on current cell (if any)
 		String moveDescription;
 		moveDescription=actionOnCell();
 		return  moveDescription;
 	}
 	
+	/**
+	 * Does the action that has to be done when moving on a cell.
+	 *
+	 * @return the description string of the action
+	 */
 	private String actionOnCell()
 	{
 		String descr="";
 		if(currentCell.type==Type.Trap)
 		{
-			descr="Trying to stop trap\n";
+			descr="Trying to deffuse trap\n";
 			boolean exploded=map.explodes(currentCell);
 			currentCell.type=Type.Empty;
 			if(exploded)
 			{
-				descr+="Trap exploded\n";
+				descr+="Trap triggered!\n";
 				map.hitpoints-=currentCell.damage;
-			}	
+			}
+			else
+				descr+="Successful defuse!\n";
 		}
-		
-		return descr+"Move to ["+currentCell.x+","+currentCell.y+"]";
+		else if(currentCell.type==Type.Clue)
+		{
+			descr="Found clue: "+currentCell.hint+"\n";
+			if(!findExit)	//if we found the goal and we are going for the exit, ignore the clue
+				knownClueCells.add(currentCell);
+			else
+				descr+="Ignoring...\n";
+			currentCell.type=Type.Empty;
+		}
+		else if (currentCell.type==Type.Goal)
+		{
+			descr="Found goal Cell!\n";
+			currentCell.type=Type.Empty;
+			findExit=true;
+			//clear clue information, cause it's useless
+			knownClueCells.clear();
+		}
+		else if(currentCell.type==Type.Exit && findExit)
+		{
+			descr="Moved to ["+currentCell.x+","+currentCell.y+"]\nExit found" +
+					" and\n exploration complete!";
+			finished=true;
+			return descr;
+		}
+		return descr+"Moved to ["+currentCell.x+","+currentCell.y+"]";
 	}
 	
 	/**
-	 * Update visible.
+	 * Update visible cells.
 	 */
 	private void updateVisible()
 	{
@@ -140,7 +211,7 @@ public class ExplorationEngine {
 		for(Cell cell:visibleCells)
 			cell.visible=Visibility.Known;
 		
-		//Mark the new cells accordingly
+		//Get the new visible cells
 		HashSet<Cell> allVisibleCells=map.getVisibleCells(currentCell.x, currentCell.y);
 		visibleCells.clear();
 		//Break the visible cells into wall cells and normal cells
@@ -191,6 +262,7 @@ public class ExplorationEngine {
 		PriorityQueue<Cell> Q = new PriorityQueue<Cell>(knownCells);
 		while (!Q.isEmpty()) 
 		{
+			//the current is fixed and it's cost will not change
 			Cell current = Q.remove();
 			if (current.cost == Integer.MAX_VALUE)
 				break; // all remaining vertices are inaccessible from source
@@ -210,6 +282,91 @@ public class ExplorationEngine {
 						Q.add(cell);
 					}
 				}
+			//substract a bonus for cells affected by the known clues
+			for(Cell clue : knownClueCells)
+				affectCellByClue(current,clue);
+		}
+	}
+	
+	/**
+	 * Affect the cost of the cell considering the given clue cell.
+	 *
+	 * @param cell the cell
+	 * @param clue the clue
+	 */
+	private void affectCellByClue(Cell cell, Cell clue)
+	{
+
+		if(cell.x > clue.x && cell.y>clue.y && clue.hint==Direction.SE)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+
+		if(cell.x < clue.x && cell.y>clue.y && clue.hint==Direction.NE)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+		
+		if(cell.x > clue.x && cell.y<clue.y && clue.hint==Direction.SW)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+		
+		if(cell.x < clue.x && cell.y<clue.y && clue.hint==Direction.NW)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+		
+		if(cell.x > clue.x && clue.hint==Direction.S)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+		
+		if(cell.x < clue.x && clue.hint==Direction.N)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+		
+		if(cell.y > clue.y && clue.hint==Direction.E)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
+		}
+		
+		if(cell.y < clue.y && clue.hint==Direction.W)
+		{
+			//Substract the clue bonus rating and make sure we don't get negative cost
+			cell.cost-=CLUE_BONUS_RATING;
+			if(cell.cost<0)
+				cell.cost=0;
+			return;
 		}
 	}
 	
@@ -225,7 +382,7 @@ public class ExplorationEngine {
 		PriorityQueue<Cell> goals=new PriorityQueue<Cell>();
 		for(Cell cell:knownCells)
 		{
-			if(cell.type==Type.Goal)
+			if(isGoalState(cell))
 			{
 				goals.clear();
 				goals.add(cell);
