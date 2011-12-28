@@ -12,6 +12,7 @@ import java.awt.Canvas;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -56,10 +57,8 @@ public class MainFrame extends JFrame {
 	/**
 	 * Instantiates a new main frame.
 	 */
-	public MainFrame(Map map) {
-		Map[] maps=new Map[1];
-		maps[0]=map;
-		initialize(maps,1);
+	public MainFrame(ArrayList<Map> maps) {
+		initialize(maps.toArray(new Map[maps.size()]),maps.size());
 		this.setVisible(true);
 	}
 
@@ -68,7 +67,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize(Map[] maps, int count) {
 
-		this.setBounds(100, 100, 1161, 639);
+		this.setBounds(100, 100, 1200, 600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -109,7 +108,7 @@ public class MainFrame extends JFrame {
 		//Side Section
 		JPanel sidePanel = new JPanel();
 		getContentPane().add(sidePanel, BorderLayout.EAST);
-		sidePanel.setLayout(new MigLayout("", "[176.00px,grow]", "[15px][0.00px][][][][grow]"));
+		sidePanel.setLayout(new MigLayout("", "[220.00px,grow]", "[15px][0.00px][][][][grow]"));
 
 		JLabel lblSideTitle = new JLabel("Control Panel");
 		lblSideTitle.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -168,6 +167,7 @@ public class MainFrame extends JFrame {
 		panelDescription.setLayout(new BorderLayout(0, 0));
 		
 		textAreaDescription = new JTextArea();
+		textAreaDescription.setLineWrap(true);
 		textAreaDescription.setColumns(20);
 		panelDescription.add(textAreaDescription, BorderLayout.WEST);
 		

@@ -31,7 +31,7 @@ public class CellGraphics extends Cell {
 	public static final Color currentTargetColor = new Color(0.95f,0.7f,0.7f);
 	public static int minXCell = 0;
 	public static int minYCell = 0;
-	
+	public static int maxYCell = 0;
 	
 	/**
 	 * Instantiates a new cell graphics.
@@ -50,13 +50,13 @@ public class CellGraphics extends Cell {
 	 *
 	 * @param g the g
 	 */
-	public void draw(Graphics2D g)
+	public void draw(Graphics2D g, int mapSkipXCells, int mapSkipYCells)
 	{
 		// Calculate which cell this one is (compared to the most left and top
 		// one)
 		// Also, skip 1 row and 1 column (padding)
-		int xCount = this.x - CellGraphics.minXCell + 1;
-		int yCount = this.y - CellGraphics.minYCell + 1;
+		int xCount = this.x - CellGraphics.minXCell + 1 + mapSkipXCells;
+		int yCount = this.y - CellGraphics.minYCell + 1 + mapSkipYCells;
 
 		// Calculate coordinates
 		int xPos = xCount * (size + padding);
@@ -133,5 +133,22 @@ public class CellGraphics extends Cell {
 		// Draw the text inside
 		g.setColor(colorText);
 		g.drawString(text, textXPos, textYPos);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public CellGraphics clone() {
+		CellGraphics newCell=new CellGraphics(this.x, this.y, this.type);
+		newCell.cost=this.cost;
+		newCell.damage=this.damage;
+		newCell.hint=this.hint;
+		newCell.predecessor=null;
+		newCell.probability=this.probability;
+		newCell.visible=this.visible;
+		
+		return newCell;
 	}
 }

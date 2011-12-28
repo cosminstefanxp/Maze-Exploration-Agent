@@ -110,6 +110,7 @@ public class Cell implements Comparable<Cell> {
 		this.type = type;
 		this.visible=Visibility.Hidden;
 		this.hint=null;
+		this.predecessor=null;
 	}
 
 	/* (non-Javadoc)

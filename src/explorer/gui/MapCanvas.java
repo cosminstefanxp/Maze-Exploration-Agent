@@ -63,7 +63,7 @@ public class MapCanvas extends Canvas {
 			if(maps[i]!=null)
 			{
 				for(Cell cell: maps[i].cells.values())
-					((CellGraphics)cell).draw(g2);	
+					((CellGraphics)cell).draw(g2,0,i*(CellGraphics.maxYCell-CellGraphics.minYCell+5));	
 			}
 			else
 			{
@@ -71,7 +71,7 @@ public class MapCanvas extends Canvas {
 				g2.drawString("Missing cells map", 30, 30);
 			}
 			g2.setColor(Color.WHITE);
-			g2.drawString("Player hitpoints: "+maps[i].hitpoints, 10, this.getHeight()-10);
+			g2.drawString("Player hitpoints: "+maps[i].hitpoints, i*500+10, this.getHeight()-10);
 		}
 	}
 }

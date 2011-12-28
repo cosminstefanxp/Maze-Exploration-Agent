@@ -6,19 +6,14 @@
  */
 package explorer;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
-import explorer.Cell.Direction;
 import explorer.Cell.Type;
-import explorer.Cell.Visibility;
 import explorer.gui.CellGraphics;
 
 /**
@@ -27,7 +22,7 @@ import explorer.gui.CellGraphics;
 public class Map {
 
 	/** The rand. */
-	Random rand=new Random();
+	private Random rand=new Random();
 	
 	/** The cells. */
 	public HashMap<Position, Cell> cells;
@@ -53,110 +48,6 @@ public class Map {
 	public Map() {
 		super();
 		cells = new HashMap<Position,Cell>(30, 0.5f);
-	}
-
-	/**
-	 * Load the map and game info from file. Returns a list of CellGraphics
-	 * directly referencing the same cells as the ones from the map. The list
-	 * can be used for the graphics of the application.
-	 *
-	 * @param filename the filename
-	 * @return the array list
-	 * @throws FileNotFoundException the file not found exception
-	 */
-	public ArrayList<CellGraphics> loadFromFile(String filename) throws FileNotFoundException {
-
-		MainLauncher.debug("Loading map data from " + filename);
-		// Use buffering, reading one line at a time
-		Scanner input = new Scanner(new FileReader(filename));
-		ArrayList<CellGraphics> cellsGraphics = new ArrayList<CellGraphics>();
-
-		// Get the starting position
-		startX = input.nextInt();
-		startY = input.nextInt();
-		MainLauncher.debug("Start point: " + startX + "," + startY);
-
-		// Get the starting hit points
-		hitpoints = input.nextInt();
-		MainLauncher.debug("Starting hitpoints: " + hitpoints);
-		
-		// Get the visibility range
-		range = input.nextInt();
-		MainLauncher.debug("Visibility range: " + range);
-
-		// Get the number of cells
-		int cellsNo = input.nextInt();
-		MainLauncher.debug("Number of cells: " + cellsNo);
-
-		// Get the cells
-		int posX, posY, typeV;
-		int minXCell=Integer.MAX_VALUE;
-		minYCell=Integer.MAX_VALUE;
-		maxYCell=0;
-		Type type;
-		for (int i = 0; i < cellsNo; i++) {
-			// Reading cell data
-			posX = input.nextInt();
-			posY = input.nextInt();
-			typeV = input.nextInt();
-			
-			//Check for minimum
-			if(posX<minXCell)
-				minXCell=posX;
-			if(posY<minYCell)
-				minYCell=posY;
-			if(posY>maxYCell)
-				maxYCell=posY;
-			
-			// Get the type
-			switch (typeV) {
-			case 1:
-				type = Type.Goal;
-				break;
-			case 0:
-				type = Type.Empty;
-				break;
-			case -1:
-				type = Type.Wall;
-				break;
-			case -2:
-				type = Type.Trap;
-				break;
-			case 2:
-				type = Type.Clue;
-				break;
-			case 3:
-				type = Type.Exit;
-				break;
-			default:
-				type = Type.Wall;
-				break;
-			}
-
-			// Build the cell and read more data if necessary
-			CellGraphics newCell = new CellGraphics(posX, posY, type);
-
-			if (type == Type.Trap)
-				newCell.probability = input.nextFloat();
-			if (type == Type.Clue)
-				newCell.hint = Direction.valueOf(input.next());
-
-			// Mark the starting color
-			if (posX == startX && posY == startY)
-				newCell.visible = Visibility.Current;
-
-			MainLauncher.debug("New cell: " + newCell.toString());
-			cells.put(new Position(posX, posY), newCell);
-			cellsGraphics.add(newCell);
-		}
-		
-		//Set Cell Graphics minimum
-		CellGraphics.minXCell=minXCell;
-		CellGraphics.minYCell=minYCell;
-		
-		input.close();
-
-		return cellsGraphics;
 	}
 
 	/**

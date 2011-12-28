@@ -28,7 +28,7 @@ public class ExplorationEngine {
 	/** The Constant CLUE_BONUS_RATING. */
 	public static final int CLUE_BONUS_RATING=100; 
 
-	/** The map. */
+	/** The associated map provider. */
 	Map map;
 	
 	/** The visible cell. */
@@ -40,24 +40,24 @@ public class ExplorationEngine {
 	/** The wall cells. */
 	HashSet<Cell> knownWallCells;
 	
-	/** The unvisited but known cells. */
-	HashSet<Cell> unvisitedCells;
-	
 	/** The known clue cells. */
 	ArrayList<Cell> knownClueCells;
 	
-	/** The current position. */
+	/** The cell where the agent is currently positioned. */
 	Cell currentCell;
 	
-	/** The target cell. Actually it's the selected target, but on the graphical interface, the colored
-	 * cell is the one that was selected as a target for the move that was done to get to the current position.*/
+	/** The target cell. Actually it's the selected target, and on the graphical interface, the colored
+	 *  cell is the one that was selected as a target for the move that was done to get to the current position.*/
 	Cell currentTargetCell;
 	
 	/** If the agent should find an exit or a goal. */
-	boolean findExit;
+	boolean goalFound;
 	
 	/** If the exploration is finished. */
 	public boolean finished;
+	
+	/** The engine id. */
+	public int id;
 	
 
 	/**
@@ -65,7 +65,7 @@ public class ExplorationEngine {
 	 *
 	 * @param map the map
 	 */
-	public ExplorationEngine(Map map) {
+	public ExplorationEngine(Map map, int id) {
 		super();
 		
 		//Prepare the fields
@@ -77,8 +77,8 @@ public class ExplorationEngine {
 		this.knownClueCells=new ArrayList<Cell>();
 		updateVisible();
 		this.knownCells.add(currentCell);
-		this.unvisitedCells=new HashSet<Cell>(visibleCells);
-		this.unvisitedCells.remove(currentCell);
+		this.id=id;
+		this.goalFound=false;
 		
 		//Mark the cells accordingly
 		for(Cell cell:visibleCells)
@@ -88,13 +88,13 @@ public class ExplorationEngine {
 	}
 	
 	/**
-	 * Checks if the given cell is the current goal cell (exit or artefact).
+	 * Checks if the given cell is the current goal cell (exit or goal).
 	 *
 	 * @return true, if is on goal state
 	 */
 	public boolean isGoalState(Cell cell)
 	{
-		if(!findExit)
+		if(!goalFound)
 			return cell.type==Type.Goal;
 		else
 			return cell.type==Type.Exit;
@@ -105,9 +105,9 @@ public class ExplorationEngine {
 	 *
 	 * @return true, if is on goal state
 	 */
-	public boolean isOnGoalState()
+	public boolean isFinished()
 	{
-		return findExit && isGoalState(currentCell);
+		return goalFound && isGoalState(currentCell);
 	}
 	
 	/**
@@ -118,19 +118,22 @@ public class ExplorationEngine {
 	public String nextStep()
 	{
 			
-		MainLauncher.debug("Calculating next step from "+currentCell);
+		MainLauncher.debug("[Engine "+id+"] Calculating next step from "+currentCell);
 
 		//Check for goal state
-		if(isOnGoalState())
+		if(isFinished())
+		{
+			MainLauncher.debug("[Engine "+id+"] Reached goal cell and exit! Exploration finished!");
 			return "Reached goal cell!";
+		}
 		
 		//Get updated ratings
 		updateCosts();
-		MainLauncher.debug("Cells after ratings calculation "+knownCells);
+		MainLauncher.debug("[Engine "+id+"] Cells after ratings calculation "+knownCells);
 		//Get potential targets
 		currentTargetCell.visible=Visibility.Known;
 		PriorityQueue<Cell> potentialTargets=getPotentialTargets();
-		MainLauncher.debug("Potential target cells: "+potentialTargets);
+		MainLauncher.debug("[Engine "+id+"] Potential target cells: "+potentialTargets);
 		//Select potential target and get path
 		if(potentialTargets.isEmpty())
 		{
@@ -139,17 +142,18 @@ public class ExplorationEngine {
 		}
 		currentTargetCell=potentialTargets.remove();
 		LinkedList<Cell> path=getPathTo(currentCell, currentTargetCell);
-		MainLauncher.debug("Selected target "+currentTargetCell+" with path: "+path);
+		MainLauncher.debug("[Engine "+id+"] Selected target "+currentTargetCell+" with path: "+path);
 		//Update to the new position
 		this.updateCurrent(path.getFirst());
 		this.updateVisible();
 		//Update visibility for current target and current position
 		currentTargetCell.visible=Visibility.Target;
 		currentCell.visible=Visibility.Current;
-		MainLauncher.debug("Moving to "+currentCell+"\n");
+		MainLauncher.debug("[Engine "+id+"] Moving to "+currentCell+"\n");
 		//Perform action on current cell (if any)
 		String moveDescription;
 		moveDescription=actionOnCell();
+		
 		return  moveDescription;
 	}
 	
@@ -160,13 +164,13 @@ public class ExplorationEngine {
 	 */
 	private String actionOnCell()
 	{
-		String descr="";
+		String descr="["+id+"] ";
 		if(currentCell.type==Type.Trap)
 		{
-			descr="Trying to deffuse trap\n";
-			boolean exploded=map.explodes(currentCell);
+			//Check if the trap is triggered
+			descr+="Trying to deffuse trap\n";
 			currentCell.type=Type.Empty;
-			if(exploded)
+			if(map.explodes(currentCell))
 			{
 				descr+="Trap triggered!\n";
 				map.hitpoints-=currentCell.damage;
@@ -176,8 +180,8 @@ public class ExplorationEngine {
 		}
 		else if(currentCell.type==Type.Clue)
 		{
-			descr="Found clue: "+currentCell.hint+"\n";
-			if(!findExit)	//if we found the goal and we are going for the exit, ignore the clue
+			descr+="Found clue: "+currentCell.hint+"\n";
+			if(!goalFound)	//if we found the goal and we are going for the exit, ignore the clue
 				knownClueCells.add(currentCell);
 			else
 				descr+="Ignoring...\n";
@@ -185,16 +189,16 @@ public class ExplorationEngine {
 		}
 		else if (currentCell.type==Type.Goal)
 		{
-			descr="Found goal Cell!\n";
+			descr+="Found goal Cell!\n";
 			currentCell.type=Type.Empty;
-			findExit=true;
-			//clear clue information, cause it's useless
+			goalFound=true;
+			//clear clue information, cause it's useless now
 			knownClueCells.clear();
 		}
-		else if(currentCell.type==Type.Exit && findExit)
+		else if(currentCell.type==Type.Exit && goalFound)
 		{
-			descr="Moved to ["+currentCell.x+","+currentCell.y+"]\nExit found" +
-					" and\n exploration complete!";
+			descr+="Moved to ["+currentCell.x+","+currentCell.y+"]\nExit found" +
+					" and exploration complete!";
 			finished=true;
 			return descr;
 		}
@@ -229,9 +233,9 @@ public class ExplorationEngine {
 		//Add the new cells to the known list
 		this.knownCells.addAll(visibleCells);
 		
-		MainLauncher.debug("Visible after update: "+visibleCells);
-		MainLauncher.debug("Known after update: "+knownCells);
-		MainLauncher.debug("Known wall cells after update: " + knownWallCells);
+		MainLauncher.debug("[Engine "+id+"] Visible after update: "+visibleCells);
+		MainLauncher.debug("[Engine "+id+"] Known after update: "+knownCells);
+		MainLauncher.debug("[Engine "+id+"] Known wall cells after update: " + knownWallCells);
 	}
 	
 	/**
