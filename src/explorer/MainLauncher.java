@@ -88,7 +88,8 @@ public class MainLauncher {
 		for(int i=0;i<agents;i++)
 		{
 			MainLauncher.debug("Reading start info for player "+i);
-			maps.add(new Map());
+			maps.add(new Map(i));
+			maps.get(i).maps=maps;
 			
 			// Get the starting position
 			maps.get(i).startX = input.nextInt();
@@ -221,7 +222,7 @@ public class MainLauncher {
 		//Start the exploration engines
 		engines=new ExplorationEngine[maps.size()];
 		for(int i=0;i<maps.size();i++)
-			engines[i]=new ExplorationEngine(maps.get(i),i);
+			engines[i]=new ExplorationEngine(maps.get(i),i+1);
 		frame.repaintMap();
 		
 		//While we have not found the goal, we keep exploring

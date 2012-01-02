@@ -29,6 +29,7 @@ public class CellGraphics extends Cell {
 	public static final Color exitColor = Color.BLUE;
 	public static final Color currentPositionColor = Color.CYAN;
 	public static final Color currentTargetColor = new Color(0.95f,0.7f,0.7f);
+	public static final Color enemyColor = Color.RED;
 	public static int minXCell = 0;
 	public static int minYCell = 0;
 	public static int maxYCell = 0;
@@ -120,7 +121,11 @@ public class CellGraphics extends Cell {
 		case Exit:
 			text = "e";
 			colorText = exitColor;
-			break;			
+			break;
+		case Enemy:
+			colorText = enemyColor;
+			text = "X";
+			break;
 		default:
 			text = "!";
 			colorText = Color.RED;

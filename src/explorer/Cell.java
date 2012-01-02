@@ -26,6 +26,8 @@ public class Cell implements Comparable<Cell> {
 		Empty,
 		/** The Goal. */
 		Goal,
+		/** The Enemy. */
+		Enemy,
 		/** The Exit. */
 		Exit
 	}

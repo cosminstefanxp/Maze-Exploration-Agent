@@ -42,12 +42,19 @@ public class Map {
 	/* The minimum column of the map. */
 	public int minYCell, maxYCell;
 	
+	/** The id. */
+	public int id;
+	
+	/** A list with all the maps. Including this one. */
+	public ArrayList<Map> maps;
+	
 	/**
 	 * Instantiates a new map.
 	 */
-	public Map() {
+	public Map(int id) {
 		super();
-		cells = new HashMap<Position,Cell>(30, 0.5f);
+		this.cells = new HashMap<Position,Cell>(30, 0.5f);
+		this.id=id;
 	}
 
 	/**
@@ -246,4 +253,37 @@ public class Map {
 			return true;
 		return false;
 	}
+	
+	/**
+	 * Change the type of a cell and notify the map system. This map should notify any other associated maps of the type cell for the given cell.
+	 *
+	 * @param cell the cell
+	 */
+	public void changeCellType(Cell cell, Type type)
+	{
+		cell.type=type;
+		//Notify other associated maps of the type change
+		for(Map map:maps)
+			if(map!=this)
+			{
+				map.cells.get(new Position(cell.x,cell.y)).type=type;
+			}
+	}
+	
+	/**
+	 * Notify cell type change.
+	 *
+	 * @param cell the cell
+	 * @param type the type
+	 */
+	public void notifyCellTypeChange(Cell cell, Type type)
+	{
+		//Notify other associated maps of the type change
+		for(Map map:maps)
+			if(map!=this)
+			{
+				map.cells.get(new Position(cell.x,cell.y)).type=type;
+			}
+	}
+	
 }

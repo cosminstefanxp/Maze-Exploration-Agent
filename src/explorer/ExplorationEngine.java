@@ -27,6 +27,9 @@ public class ExplorationEngine {
 	
 	/** The Constant CLUE_BONUS_RATING. */
 	public static final int CLUE_BONUS_RATING=100; 
+	
+	/** The Constant ENEMY_RATING. */
+	public static final int ENEMY_RATING=500;
 
 	/** The associated map provider. */
 	Map map;
@@ -45,6 +48,9 @@ public class ExplorationEngine {
 	
 	/** The cell where the agent is currently positioned. */
 	Cell currentCell;
+	
+	/** The cell where the agent was previously positioned. */
+	Cell previousCell;
 	
 	/** The target cell. Actually it's the selected target, and on the graphical interface, the colored
 	 *  cell is the one that was selected as a target for the move that was done to get to the current position.*/
@@ -154,6 +160,11 @@ public class ExplorationEngine {
 		String moveDescription;
 		moveDescription=actionOnCell();
 		
+		//Notify other maps of the position of the current engine
+		map.notifyCellTypeChange(currentCell, Type.Enemy);
+		map.notifyCellTypeChange(previousCell, Type.Empty);	//if there was an engine there, then it's now empty
+
+		
 		return  moveDescription;
 	}
 	
@@ -169,7 +180,7 @@ public class ExplorationEngine {
 		{
 			//Check if the trap is triggered
 			descr+="Trying to deffuse trap\n";
-			currentCell.type=Type.Empty;
+			map.changeCellType(currentCell, Type.Empty);
 			if(map.explodes(currentCell))
 			{
 				descr+="Trap triggered!\n";
@@ -185,12 +196,12 @@ public class ExplorationEngine {
 				knownClueCells.add(currentCell);
 			else
 				descr+="Ignoring...\n";
-			currentCell.type=Type.Empty;
+			map.changeCellType(currentCell, Type.Empty);
 		}
 		else if (currentCell.type==Type.Goal)
 		{
 			descr+="Found goal Cell!\n";
-			currentCell.type=Type.Empty;
+			map.changeCellType(currentCell, Type.Empty);
 			goalFound=true;
 			//clear clue information, cause it's useless now
 			knownClueCells.clear();
@@ -245,6 +256,7 @@ public class ExplorationEngine {
 	 */
 	public void updateCurrent(Cell newCell)
 	{
+		this.previousCell=this.currentCell;
 		this.currentCell.visible=Visibility.Known;
 		this.currentCell=newCell;
 		newCell.visible=Visibility.Current;
@@ -276,8 +288,16 @@ public class ExplorationEngine {
 			for (Cell cell : neigh)
 				// if it hasn't been eliminated from the queue
 				if (Q.contains(cell)) {
-					// Try to relax
-					int dist = current.cost + cell.getDefaultRating();
+					// Try to relax, compute cost
+					int dist; 
+					{
+						dist = current.cost + cell.getDefaultRating();
+						//affect cell cost by enemy
+						if(cell.type.equals(Type.Enemy))
+							dist+=ENEMY_RATING*(5-this.map.hitpoints);
+						if(dist<0)
+							dist=0;
+					}
 					if (dist < cell.cost) {
 						cell.cost = dist;
 						cell.predecessor = current;
