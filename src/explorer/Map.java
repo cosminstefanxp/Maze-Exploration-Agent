@@ -22,7 +22,7 @@ import explorer.gui.CellGraphics;
 public class Map {
 
 	/** The rand. */
-	private Random rand=new Random();
+	public static Random rand=new Random();
 	
 	/** The cells. */
 	public HashMap<Position, Cell> cells;
@@ -270,19 +270,19 @@ public class Map {
 			}
 	}
 	
+
 	/**
-	 * Notify cell type change.
+	 * Notify position.
 	 *
 	 * @param cell the cell
-	 * @param type the type
 	 */
-	public void notifyCellTypeChange(Cell cell, Type type)
+	public void notifyPosition(Cell cell, Integer id)
 	{
 		//Notify other associated maps of the type change
 		for(Map map:maps)
 			if(map!=this)
 			{
-				map.cells.get(new Position(cell.x,cell.y)).type=type;
+				map.cells.get(new Position(cell.x,cell.y)).enemy=id;
 			}
 	}
 	

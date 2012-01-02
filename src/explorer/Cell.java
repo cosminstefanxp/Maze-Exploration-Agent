@@ -26,8 +26,6 @@ public class Cell implements Comparable<Cell> {
 		Empty,
 		/** The Goal. */
 		Goal,
-		/** The Enemy. */
-		Enemy,
 		/** The Exit. */
 		Exit
 	}
@@ -97,6 +95,9 @@ public class Cell implements Comparable<Cell> {
 	
 	/** The previous. */
 	public Cell predecessor;
+	
+	/** The enemy id. If null, no enemy is there. */
+	public Integer enemy;
 	
 	/**
 	 * Instantiates a new cell.

@@ -122,13 +122,16 @@ public class CellGraphics extends Cell {
 			text = "e";
 			colorText = exitColor;
 			break;
-		case Enemy:
-			colorText = enemyColor;
-			text = "X";
-			break;
 		default:
 			text = "!";
 			colorText = Color.RED;
+		}
+		
+		if(enemy!=null)
+		{
+			text = "X"+enemy;
+			textXPos-=4;
+			colorText=enemyColor;
 		}
 		
 		// Draw the cell

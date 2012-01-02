@@ -192,7 +192,7 @@ public class MainLauncher {
 		
 		//Prepare the Maps
 		try {
-			maps=loadFromFile("test4");
+			maps=loadFromFile("test5");
 			enginesCount=maps.size();
 		} catch (FileNotFoundException e1) {
 			JOptionPane.showMessageDialog(null, "Error while reading map file.", "Eroare citire fisier", JOptionPane.ERROR_MESSAGE);
@@ -263,6 +263,33 @@ public class MainLauncher {
 		{
 			moveDescription=engines[i].nextStep();
 			frame.addMoveDescription(moveDescription);
+			//check engine battle
+			if(!engines[i].finished && engines[i].currentCell.enemy!=null)
+			{
+				String desc=String.format("Engine %d vs Engine %d battle!\n",i+1,engines[i].currentCell.enemy);
+				debug(String.format("Engine %d vs Engine %d battle on cell %s", i+1,engines[i].currentCell.enemy,engines[i].currentCell));
+				
+				//Check winner
+				float winnerProb=Map.rand.nextFloat();
+				float lifeRation=(float)engines[i].map.hitpoints/(engines[i].map.hitpoints+engines[engines[i].currentCell.enemy-1].map.hitpoints);
+				
+				if(winnerProb>lifeRation)	//this engine lost
+				{
+					debug("Engine "+engines[i].currentCell.enemy+" won the battle!");
+					desc+="Engine "+engines[i].currentCell.enemy+" won the battle!";
+					engines[i].finished=true;
+					engines[i].map.notifyPosition(engines[i].currentCell, null);
+				}
+				else	//this engine won
+				{
+					debug("Engine "+(i+1)+" won the battle!");
+					desc+="Engine "+(i+1)+" won the battle!";
+					engines[engines[i].currentCell.enemy-1].finished=true;
+					engines[engines[i].currentCell.enemy-1].map.notifyPosition(engines[engines[i].currentCell.enemy-1].currentCell, null);
+				}
+				
+				frame.addMoveDescription(desc);
+			}
 			//if an engined found both the goal and the exit, the simulation is over
 			if(engines[i].isFinished())
 			{

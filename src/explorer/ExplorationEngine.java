@@ -126,6 +126,10 @@ public class ExplorationEngine {
 			
 		MainLauncher.debug("[Engine "+id+"] Calculating next step from "+currentCell);
 
+		if(finished)
+		{
+			return "Engine finished exploration";
+		}
 		//Check for goal state
 		if(isFinished())
 		{
@@ -159,11 +163,12 @@ public class ExplorationEngine {
 		//Perform action on current cell (if any)
 		String moveDescription;
 		moveDescription=actionOnCell();
-		
-		//Notify other maps of the position of the current engine
-		map.notifyCellTypeChange(currentCell, Type.Enemy);
-		map.notifyCellTypeChange(previousCell, Type.Empty);	//if there was an engine there, then it's now empty
-
+		//check if dead
+		if(map.hitpoints<=0)
+		{
+			this.finished=true;
+			return moveDescription+"\nEngine is DEAD!";
+		}
 		
 		return  moveDescription;
 	}
@@ -260,6 +265,10 @@ public class ExplorationEngine {
 		this.currentCell.visible=Visibility.Known;
 		this.currentCell=newCell;
 		newCell.visible=Visibility.Current;
+		
+		//Notify other maps of the position of the current engine
+		map.notifyPosition(currentCell, this.id);
+		map.notifyPosition(previousCell, null);
 	}
 	
 	/**
@@ -293,7 +302,7 @@ public class ExplorationEngine {
 					{
 						dist = current.cost + cell.getDefaultRating();
 						//affect cell cost by enemy
-						if(cell.type.equals(Type.Enemy))
+						if(cell.enemy!=null)
 							dist+=ENEMY_RATING*(5-this.map.hitpoints);
 						if(dist<0)
 							dist=0;
