@@ -64,7 +64,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize(Map[] maps, int count) {
 
-		this.setBounds(100, 100, 1243, 599);
+		this.setBounds(100, 100, 1243, 799);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 

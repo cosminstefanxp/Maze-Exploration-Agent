@@ -8,7 +8,7 @@ package explorer;
 
 
 /**
- * The Class Cell.
+ * The Class Cell. 
  */
 public class Cell implements Comparable<Cell> {
 

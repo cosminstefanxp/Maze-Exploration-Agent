@@ -8,7 +8,7 @@ Descriere generala:
 	o tema a fost implementata folosind Java, si a fost testata in Eclipse, pe un sistem Ubuntu 11.04
 	o interfata vizuala foloseste SWING si desenarea pe Canvas din Java
 	o citirea datelor despre harta si despre agenti se face din fisier
-	o tema este insotita de 5 teste, primele 3 cu un singur agent, testele 4 si 5 cu mai multi agenti. Pentru a schimba fisierul de test, se schimba fisierul din care se face incarcarea din MainLauncher.java, linia 191.
+	o tema este insotita de 5 fisiere de teste (test1, test2, test3, test4 si test5), primele 3 cu un singur agent, testele 4 si 5 cu mai multi agenti. Pentru a schimba fisierul de test, se schimba fisierul din care se face incarcarea din MainLauncher.java, linia 191.
 	o interfata grafica are in sectiunea dreapta doua butoane de control pentru agenti, in partea centrala o harta grafica a starii curente si in partea inferioara se gaseste o legenda
 	
 	o am implementat toate cerintele temei, plus toate BONUSURILE prezente in cerinta (interfata grafica avansata, existenta mai multor agenti, cresterea puterii unui agent)
