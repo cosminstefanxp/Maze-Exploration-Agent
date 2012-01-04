@@ -10,7 +10,6 @@ import java.awt.EventQueue;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
@@ -50,9 +49,6 @@ public class MainLauncher {
 	
 	/** The engines count. */
 	public static int enginesCount;
-	
-	/** The path. */
-	public static LinkedList<Cell> path=new LinkedList<Cell>();
 	
 	/**
 	 * Debug printing.
@@ -192,7 +188,7 @@ public class MainLauncher {
 		
 		//Prepare the Maps
 		try {
-			maps=loadFromFile("test5");
+			maps=loadFromFile("test4");
 			enginesCount=maps.size();
 		} catch (FileNotFoundException e1) {
 			JOptionPane.showMessageDialog(null, "Error while reading map file.", "Eroare citire fisier", JOptionPane.ERROR_MESSAGE);
@@ -254,16 +250,16 @@ public class MainLauncher {
 	public static boolean nextMove()
 	{
 		String moveDescription = null;
-		//Save current position
-		//path.push(engine.currentCell);
 
 		//Perform the next step and redraw
 		int finishCount=0;
-		for(int i=0;i<maps.size();i++)
+		for(int i=0;i<enginesCount;i++)		//For each of the engines
 		{
+			//do the actual move of choice of the agent
 			moveDescription=engines[i].nextStep();
 			frame.addMoveDescription(moveDescription);
-			//check engine battle
+			
+			//check engine battle (if the engine did not finish and there is an enemy in the current cell
 			if(!engines[i].finished && engines[i].currentCell.enemy!=null)
 			{
 				String desc=String.format("Engine %d vs Engine %d battle!\n",i+1,engines[i].currentCell.enemy);
@@ -275,23 +271,39 @@ public class MainLauncher {
 				
 				if(winnerProb>lifeRation)	//this engine lost
 				{
-					debug("Engine "+engines[i].currentCell.enemy+" won the battle!");
-					desc+="Engine "+engines[i].currentCell.enemy+" won the battle!";
-					engines[i].finished=true;
-					engines[i].map.notifyPosition(engines[i].currentCell, null);
+					debug("Engine "+engines[i].currentCell.enemy+" won the battle! Adding bonus hitpoint!");
+					desc+="Engine "+engines[i].currentCell.enemy+" won the battle! Adding bonus hitpoint!";
+					//give the winner a bonus
+					engines[engines[i].currentCell.enemy-1].map.hitpoints++;
+					//take the goal, if the enemy was carrying it
+					if(engines[i].carriesGoal)
+					{
+						engines[engines[i].currentCell.enemy-1].carriesGoal=true;
+						desc+=" Pickup goal!";
+						debug("Engine "+engines[i].currentCell.enemy+" picks up the goal!");
+					}
+					engines[i].eliminate();
 				}
 				else	//this engine won
 				{
-					debug("Engine "+(i+1)+" won the battle!");
-					desc+="Engine "+(i+1)+" won the battle!";
-					engines[engines[i].currentCell.enemy-1].finished=true;
-					engines[engines[i].currentCell.enemy-1].map.notifyPosition(engines[engines[i].currentCell.enemy-1].currentCell, null);
+					debug("Engine "+(i+1)+" won the battle! Adding bonus hitpoint!");
+					desc+="Engine "+(i+1)+" won the battle! Adding bonus hitpoint!";
+					//give the winner a bonus
+					engines[i].map.hitpoints++;
+					//take the goal, if the enemy was carrying it
+					if(engines[engines[i].currentCell.enemy-1].carriesGoal)
+					{
+						debug("Engine "+(i+1)+" picks up the goal!");
+						engines[i].carriesGoal=true;
+						desc+=" Pickup goal!";
+					}
+					engines[engines[i].currentCell.enemy-1].eliminate();
 				}
 				
 				frame.addMoveDescription(desc);
 			}
 			//if an engined found both the goal and the exit, the simulation is over
-			if(engines[i].isFinished())
+			if(engines[i].isSuccessful())
 			{
 				debug("Engine "+i+" successfully found the goal and exit!");
 				frame.repaintMap();
@@ -311,21 +323,5 @@ public class MainLauncher {
 		}
 		else
 			return false;
-	}
-	
-	/**
-	 * Previous move.
-	 */
-	public static void previousMove()
-	{
-		if(path.isEmpty())
-		{
-			frame.addMoveDescription("No previous moves");
-			return;
-		}
-		//Perform the previous step and redraw
-		//engine.updateCurrent(path.pop());
-		frame.addMoveDescription("Moved back");
-		frame.repaintMap();
 	}
 }

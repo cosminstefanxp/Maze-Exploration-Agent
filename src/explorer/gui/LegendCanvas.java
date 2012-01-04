@@ -50,40 +50,48 @@ public class LegendCanvas extends Canvas {
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Goal);
-		cell.drawAt(g2, 100, 10);
+		cell.drawAt(g2, 90, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Goal", 135, 33);
+		g2.drawString("Goal", 125, 33);
 
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Clue);
 		cell.hint=Direction.NE;
-		cell.drawAt(g2, 200, 10);
+		cell.drawAt(g2, 180, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Hint", 235, 33);
+		g2.drawString("Hint", 215, 33);
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Trap);
 		cell.probability=0.7f;
-		cell.drawAt(g2, 300, 10);
+		cell.drawAt(g2, 260, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Trap", 335, 33);
+		g2.drawString("Trap", 295, 33);
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Wall);
-		cell.drawAt(g2, 400, 10);
+		cell.drawAt(g2, 340, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Wall", 435, 33);
+		g2.drawString("Wall", 375, 33);
+		
+		//Desenam celula
+		cell=new CellGraphics(0, 0, Type.Empty);
+		cell.enemy=1;
+		cell.drawAt(g2, 420, 10);
+		//Scriem hintul
+		g2.setColor(Color.WHITE);
+		g2.drawString("Enemy", 455, 33);
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Exit);
-		cell.drawAt(g2, 500, 10);
+		cell.drawAt(g2, 515, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Exit  | ", 535, 33);
+		g2.drawString("Exit | ", 550, 33);
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Empty);
@@ -96,17 +104,25 @@ public class LegendCanvas extends Canvas {
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Empty);
 		cell.visible=Visibility.Hidden;
-		cell.drawAt(g2, 700, 10);
+		cell.drawAt(g2, 690, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Hidden", 735, 33);
+		g2.drawString("Hidden", 725, 33);
 		
 		//Desenam celula
 		cell=new CellGraphics(0, 0, Type.Empty);
 		cell.visible=Visibility.Visible;
-		cell.drawAt(g2, 800, 10);
+		cell.drawAt(g2, 780, 10);
 		//Scriem hintul
 		g2.setColor(Color.WHITE);
-		g2.drawString("Visible", 835, 33);
+		g2.drawString("Visible", 815, 33);
+		
+		//Desenam celula
+		cell=new CellGraphics(0, 0, Type.Empty);
+		cell.visible=Visibility.Current;
+		cell.drawAt(g2, 870, 10);
+		//Scriem hintul
+		g2.setColor(Color.WHITE);
+		g2.drawString("Current", 905, 33);
 	}
 }

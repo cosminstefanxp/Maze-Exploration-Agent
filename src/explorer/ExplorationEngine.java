@@ -57,7 +57,7 @@ public class ExplorationEngine {
 	Cell currentTargetCell;
 	
 	/** If the agent should find an exit or a goal. */
-	boolean goalFound;
+	boolean carriesGoal;
 	
 	/** If the exploration is finished. */
 	public boolean finished;
@@ -84,7 +84,7 @@ public class ExplorationEngine {
 		updateVisible();
 		this.knownCells.add(currentCell);
 		this.id=id;
-		this.goalFound=false;
+		this.carriesGoal=false;
 		
 		//Mark the cells accordingly
 		for(Cell cell:visibleCells)
@@ -100,7 +100,7 @@ public class ExplorationEngine {
 	 */
 	public boolean isGoalState(Cell cell)
 	{
-		if(!goalFound)
+		if(!carriesGoal)
 			return cell.type==Type.Goal;
 		else
 			return cell.type==Type.Exit;
@@ -111,9 +111,9 @@ public class ExplorationEngine {
 	 *
 	 * @return true, if is on goal state
 	 */
-	public boolean isFinished()
+	public boolean isSuccessful()
 	{
-		return goalFound && isGoalState(currentCell);
+		return carriesGoal && isGoalState(currentCell);
 	}
 	
 	/**
@@ -128,13 +128,7 @@ public class ExplorationEngine {
 
 		if(finished)
 		{
-			return "Engine finished exploration";
-		}
-		//Check for goal state
-		if(isFinished())
-		{
-			MainLauncher.debug("[Engine "+id+"] Reached goal cell and exit! Exploration finished!");
-			return "Reached goal cell!";
+			return "["+id+"] Finished exploration";
 		}
 		
 		//Get updated ratings
@@ -147,8 +141,8 @@ public class ExplorationEngine {
 		//Select potential target and get path
 		if(potentialTargets.isEmpty())
 		{
-			finished=true;
-			return "No moves left!";
+			this.eliminate();
+			return "Goal & Exit not found, but no more possible moves left!";
 		}
 		currentTargetCell=potentialTargets.remove();
 		LinkedList<Cell> path=getPathTo(currentCell, currentTargetCell);
@@ -163,6 +157,19 @@ public class ExplorationEngine {
 		//Perform action on current cell (if any)
 		String moveDescription;
 		moveDescription=actionOnCell();
+		//Check for goal state
+		if(isSuccessful())
+		{
+			MainLauncher.debug("[Engine "+id+"] Reached goal cell and exit! Exploration successful!");
+			map.changeCellType(previousCell, Type.Empty);
+			return moveDescription;
+		}
+		//If the engine is carrying the goal, mark the cell accordingly (for GUI and for other engines)
+		if(carriesGoal)
+		{
+			map.changeCellType(previousCell, Type.Empty);
+			map.changeCellType(currentCell, Type.Goal);
+		}
 		//check if dead
 		if(map.hitpoints<=0)
 		{
@@ -197,25 +204,27 @@ public class ExplorationEngine {
 		else if(currentCell.type==Type.Clue)
 		{
 			descr+="Found clue: "+currentCell.hint+"\n";
-			if(!goalFound)	//if we found the goal and we are going for the exit, ignore the clue
+			if(!carriesGoal)	//if we found the goal and we are going for the exit, ignore the clue
 				knownClueCells.add(currentCell);
 			else
 				descr+="Ignoring...\n";
 			map.changeCellType(currentCell, Type.Empty);
 		}
-		else if (currentCell.type==Type.Goal)
+		else if (currentCell.type==Type.Goal && currentCell.enemy==null)	
+			//if the cell is a goal and it is not carried by an enemy
 		{
 			descr+="Found goal Cell!\n";
 			map.changeCellType(currentCell, Type.Empty);
-			goalFound=true;
+			carriesGoal=true;
 			//clear clue information, cause it's useless now
 			knownClueCells.clear();
 		}
-		else if(currentCell.type==Type.Exit && goalFound)
+		else if(currentCell.type==Type.Exit && carriesGoal)
 		{
 			descr+="Moved to ["+currentCell.x+","+currentCell.y+"]\nExit found" +
 					" and exploration complete!";
 			finished=true;
+			this.eliminate();
 			return descr;
 		}
 		return descr+"Moved to ["+currentCell.x+","+currentCell.y+"]";
@@ -462,5 +471,18 @@ public class ExplorationEngine {
 			cell=cell.predecessor;
 		}
 		return path;
+	}
+	
+	/**
+	 * Eliminates the engine/stops the exploration and removes the agent from the map.
+	 */
+	public void eliminate()
+	{
+		this.finished=true;
+		this.map.notifyPosition(this.currentCell, null);
+		for(Cell cell:visibleCells)
+			cell.visible=Visibility.Known;
+		this.currentCell.visible=Visibility.Finished;
+		this.map.hitpoints=0;
 	}
 }

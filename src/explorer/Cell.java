@@ -43,7 +43,9 @@ public class Cell implements Comparable<Cell> {
 		/** The Robot is there. */
 		Current,
 		/** The current AI Target. */
-		Target
+		Target,
+		/** The location of the dead engine. */
+		Finished
 		
 	}
 	

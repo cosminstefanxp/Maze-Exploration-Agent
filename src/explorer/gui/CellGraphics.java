@@ -30,6 +30,7 @@ public class CellGraphics extends Cell {
 	public static final Color currentPositionColor = Color.CYAN;
 	public static final Color currentTargetColor = new Color(0.95f,0.7f,0.7f);
 	public static final Color enemyColor = Color.RED;
+	public static final Color deadColor = Color.GREEN.darker().darker();
 	public static int minXCell = 0;
 	public static int minYCell = 0;
 	public static int maxYCell = 0;
@@ -91,6 +92,7 @@ public class CellGraphics extends Cell {
 		case Visible:	color=visibleColor; break;
 		case Current:	color=currentPositionColor; break;
 		case Target:	color=currentTargetColor; break;
+		case Finished:		color=deadColor; break;
 		}
 
 		// Text attributes

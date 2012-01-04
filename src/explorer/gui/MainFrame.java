@@ -44,9 +44,6 @@ public class MainFrame extends JFrame {
 	/** The btn next move. */
 	private JButton btnNextMove;
 
-	/** The btn previous move. */
-	private JButton btnPreviousMove;
-
 	/** The map canvas. */
 	public MapCanvas mapCanvas;
 
@@ -67,7 +64,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize(Map[] maps, int count) {
 
-		this.setBounds(100, 100, 1200, 600);
+		this.setBounds(100, 100, 1243, 599);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -108,7 +105,7 @@ public class MainFrame extends JFrame {
 		//Side Section
 		JPanel sidePanel = new JPanel();
 		getContentPane().add(sidePanel, BorderLayout.EAST);
-		sidePanel.setLayout(new MigLayout("", "[220.00px,grow]", "[15px][0.00px][][][][grow]"));
+		sidePanel.setLayout(new MigLayout("", "[220.00px,grow]", "[15px][0.00px][][][grow]"));
 
 		JLabel lblSideTitle = new JLabel("Control Panel");
 		lblSideTitle.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -145,22 +142,12 @@ public class MainFrame extends JFrame {
 			}
 		});
 		sidePanel.add(btnNextMove, "cell 0 3,growx,aligny center");
-
-		btnPreviousMove = new JButton("Previous Move");
-		btnPreviousMove.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				MainLauncher.debug("Manual previous move!");
-				MainLauncher.lock.lock();
-				MainLauncher.previousMove();
-				MainLauncher.lock.unlock();
-			}
-		});
-		sidePanel.add(btnPreviousMove, "cell 0 4,growx");
 		
 		//Move Description section 
 		scrollPane = new JScrollPane();
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sidePanel.add(scrollPane, "cell 0 5,grow");
+		sidePanel.add(scrollPane, "cell 0 4,grow");
 		
 		JPanel panelDescription = new JPanel();
 		scrollPane.setViewportView(panelDescription);
@@ -168,7 +155,7 @@ public class MainFrame extends JFrame {
 		
 		textAreaDescription = new JTextArea();
 		textAreaDescription.setLineWrap(true);
-		textAreaDescription.setColumns(20);
+		textAreaDescription.setColumns(19);
 		panelDescription.add(textAreaDescription, BorderLayout.WEST);
 		
 	}
