@@ -1,45 +1,36 @@
-Inteligenta Artificiala
-Tema 3C
-
 Stefan-Dobrin Cosmin
-342C4
 
-Descriere generala:
-	o tema a fost implementata folosind Java, si a fost testata in Eclipse, pe un sistem Ubuntu 11.04
-	o interfata vizuala foloseste SWING si desenarea pe Canvas din Java
-	o citirea datelor despre harta si despre agenti se face din fisier
-	o tema este insotita de 5 fisiere de teste (test1, test2, test3, test4 si test5), primele 3 cu un singur agent, testele 4 si 5 cu mai multi agenti. Pentru a schimba fisierul de test, se schimba fisierul din care se face incarcarea din MainLauncher.java, linia 191.
-	o interfata grafica are in sectiunea dreapta doua butoane de control pentru agenti, in partea centrala o harta grafica a starii curente si in partea inferioara se gaseste o legenda
-	
-	o am implementat toate cerintele temei, plus toate BONUSURILE prezente in cerinta (interfata grafica avansata, existenta mai multor agenti, cresterea puterii unui agent)
+Details:
+The project represents designing a small artificial intelligence agent, that is supposed to explore a maze, find an artefact (goal) and then find the exit. The environment is non-deterministic and partially visibile. The agent only sees for a given number of cells, in any direction, and can go into traps, that will or will not blow up(non-deterministic). The agent has to explore the maze and decide where to go. The problem has been extended to allow for multiple agents in the same maze. If they meet, they will fight and only one of them will survive (depending on the remaining life-points).
 
-Format fisier intrare:
+The input data is given as an input file (details below). In the maze, besides walls, and free cells, there are some traps, that have a given probability of trigerring when the agent is crossing them. Also, there are some clue cells, that give a general idea regarding the direction of the clue.
+
+Format of input file:
 	----------------------------
-	numar_agenti
-	<apoi pentru fiecare agent, pe cate o linie>
+	number_of_agents
+	<for each agent, on a line>
 	startX startY
-	puncte_viata
-	distanta_vizualizare
-	<final date despre agenti>
-	numar_celule
-	<pentru fiecare celula, pe cate o linie>
-	celulaX celulaY tipCelula [aux1]
+	life_points
+	fog_of_war_distance
+	<end data regarding ag_ents>
+	number_of_cells_on_the_map
+	<for each cell, on a new line>
+	cellX cellY typeOfCell [aux1]
 	----------------------------
-	o startX, startY, celulaX, celulaY sunt numere intregi, care reprezinta coordonatele celului
-	o tipCelula este un intreg astfel:
-		* 1 - artefact
-		* 0 - celula libera
-		*-1 - perete/obstacol
-		*-2 - capcana (aux1 trebuie sa specifice probabilitatea - numar float intre 0 si 1)
-		* 2 - indiciu (aux1 trebuie sa specifice directia - sir sub formatul: N, NE, SE, S, W, etc)
-		* 3 - iesirea din labirint
-	o celulele care nu sunt specificat se considera obstacol (deci labirintul poate fi dat cu gauri)
+	o startX, startY, celulaX, celulaY - integer numbers, representing the coordinates of the cell
+	o typeOfCell, integer:
+		* 1 - artefact (goal cell)
+		* 0 - free cell
+		*-1 - wall/obstacle
+		*-2 - trap (aux1 has to specify the probability of blowing up - numar float intre 0 si 1)
+		* 2 - clue (aux1 has to specify direction - string: N, NE, SE, S, W, etc)
+		* 3 - exit of the maze
+	o whatever cell is not specified, is considered wall/obstacle
 	
-Detalii implementare:
-	o implementarea temei este impartita in doua pachete, unul de grafica si unul pentru logica ceruta
-	o am impartit partea de logica in principal in 3 bucati:
-		* ExplorationEngine - reprezinta un agent si toata logica necesara pentru efectuarea mutarilor
-		* Map - reprezinta toate informatiile referitoare la harta, la celule si la informatiile care nu sunt sub controlul agentului
-		* MainLauncher - punctul de intrare in aplicatie si de efectuare a mutarilor. Tot aici se rezolva si bataile intre agenti.
-	o detalii privind algoritmul utilizat se gasesc in cadrul codului, acesta fiind amplu documentat si avand asociata inclusiv documentatie javadoc
+Implementation details:
+	o there are 2 packages, one for graphics and one for logic
+	o logic part is divided in 3:
+		* ExplorationEngine - represents an agent and all the required logic
+		* Map - represents all the info regarding the map, cells and all the info that is not under the control of the agent.
+		* MainLauncher -entry point in the app. Agent battles are handled here.
 	

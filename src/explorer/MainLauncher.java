@@ -188,7 +188,7 @@ public class MainLauncher {
 		
 		//Prepare the Maps
 		try {
-			maps=loadFromFile("test4");
+			maps=loadFromFile("test5");
 			enginesCount=maps.size();
 		} catch (FileNotFoundException e1) {
 			JOptionPane.showMessageDialog(null, "Error while reading map file.", "Eroare citire fisier", JOptionPane.ERROR_MESSAGE);
